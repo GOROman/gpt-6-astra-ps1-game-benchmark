@@ -36,9 +36,9 @@ Run portable rule tests with `./tools/test.sh`.
 
 ## 最新の実行画面
 
-![PS1 emulator: polygon fighters after camera fix](docs/screenshots/003-octagonal-fighters.png)
+![PS1 emulator: polygon fighters after camera fix](docs/screenshots/004-camera-hud-fixed-arms-60fps.png)
 
-GitHub Actions の `45e97b3` ビルドを DuckStation で実行。手足・頭を8角断面、胴を肩・胸・腰の3段に増量。画面はCPUデモ対戦。増量版は30 FPSのため、頂点投影の共有による高速化を検証中。実機確認とは区別しています。
+GitHub Actions の `f556430` ビルドを DuckStation で実行。8角断面の人体・固定長の腕・新カメラ・上部HUDを統合。CPU対戦の描画 **60 FPS（実測59.82 FPS）** を確認。実機確認とは区別しています。
 
 [スクリーンショット付き実装履歴](docs/IMPLEMENTATION.md)
 
