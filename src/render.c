@@ -105,12 +105,13 @@ static void fighter(const Fighter*f,int frame){
  Color dark=color(30,35,48),top=f->character?color(40,55,74):color(207,203,180);
  V hip=v(0,205-crouch,0),neck=v(8,344-crouch+bob,0);
  V shoulder[2],elbow[2],hand[2],knee[2],foot[2];int i;
- if(f->action>=PUNCH&&f->action<=THROW){
+ if(f->action>=PUNCH&&f->action<=SHOULDER){
   const Move*m=&game_moves[f->action];int t=f->tick;
   extend=t<=m->startup?t*1024/m->startup:1024-(t-m->startup)*1024/(m->active+m->recovery);
   if(extend<0)extend=0;
   if(f->action==KICK||f->action==LOW_KICK||f->action==LAUNCH_KICK){kick=extend;extend=0;low=f->action==LOW_KICK;}
  }
+ if(f->action==SHOULDER){neck.x+=extend*65/1024;neck.y-=extend*25/1024;}
  if(f->action==HURT){neck.x=-35;}
  for(i=0;i<2;i++){
   int side=i?1:-1;
@@ -120,6 +121,12 @@ static void fighter(const Fighter*f,int frame){
   knee[i]=v(side*stride+24,108-crouch/2,side*44);
   foot[i]=v(side*stride+side*34,15,side*58);
   if(f->guard){elbow[i].x=65;elbow[i].y+=20;hand[i].x=65;hand[i].y=353-crouch;hand[i].z=side*28;}
+ }
+ if(f->action==SHOULDER){
+  shoulder[0].x+=extend*75/1024;shoulder[0].y-=extend*30/1024;
+  elbow[0].x=30;elbow[0].y=250;hand[0].x=50;hand[0].y=275;
+  foot[0].x+=extend*60/1024;foot[1].x-=extend*45/1024;
+  extend=0;
  }
  hand[0].x+=extend*150/1024;hand[0].y+=extend*10/1024;elbow[0].x+=extend*90/1024;
  knee[0].x+=kick*110/1024;knee[0].y+=kick*(low?0:110)/1024;

@@ -17,6 +17,11 @@ int main(void){
  start(130);strike(IN_PUNCH|IN_GUARD,IN_DOWN);assert(g.f[1].hp==100);
  start(150);game_tick(&g,IN_DOWN|IN_KICK,IN_JUMP);ticks(20,0,0);assert(g.f[1].hp==100);
  start(150);game_tick(&g,IN_PUNCH,IN_PUNCH);ticks(10,0,0);assert(g.f[0].hp==91&&g.f[1].hp==91);
+ start(235);strike(IN_SHOULDER,0);assert(g.f[1].hp==76&&g.f[1].action==DOWN);
+ start(235);strike(IN_SHOULDER,IN_GUARD);assert(g.f[1].hp==100);
+ start(235);strike(IN_SHOULDER,IN_GUARD|IN_DOWN);assert(g.f[1].hp==76);
+ start(400);strike(IN_SHOULDER,0);assert(g.f[1].hp==100);
+ start(150);g.f[0].x=570;g.f[1].x=720;strike(IN_SHOULDER,0);assert(g.reason==RING_OUT&&g.winner==0);
  start(400);strike(IN_PUNCH,0);assert(g.f[1].hp==100);
  start(150);g.f[1].hp=1;strike(IN_PUNCH,0);assert(g.reason==KO&&g.winner==0&&g.f[0].wins==1);
  ticks(150,0,0);assert(g.phase==INTRO&&g.round==2);ticks(90,0,0);assert(g.phase==FIGHT);

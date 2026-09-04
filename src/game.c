@@ -1,13 +1,14 @@
 #include "game.h"
 #include <string.h>
 
-const Move game_moves[6]={
+const Move game_moves[7]={
  {0,0,0,0,0,0,0,HIGH},
  {7,3,12,9,185,18,15,HIGH},
  {15,4,22,18,265,45,25,MID},
  {13,4,23,12,240,30,20,LOW},
  {23,4,30,26,240,100,48,MID},
- {10,1,30,22,145,125,48,GRAB}
+ {10,1,30,22,145,125,48,GRAB},
+ {11,4,31,24,175,160,48,MID}
 };
 static int absolute(int n){return n<0?-n:n;}
 static int root(unsigned n){
@@ -49,11 +50,15 @@ static void advance(Fighter*f,Fighter*other,uint16_t in){
  }
  if(f->action!=IDLE){
   const Move*m=&game_moves[f->action];
+  if(f->action==SHOULDER&&f->tick<=m->startup){
+   f->x+=f->dx*7/1024;f->z+=f->dz*7/1024;
+  }
   f->tick++; if(f->tick>=m->startup+m->active+m->recovery){f->action=IDLE;f->tick=0;}
   return;
  }
  face(f,other);f->crouch=!!(in&IN_DOWN);f->guard=!!(in&IN_GUARD);
- if((in&(IN_PUNCH|IN_GUARD))==(IN_PUNCH|IN_GUARD) && (pressed&(IN_PUNCH|IN_GUARD)))begin(f,THROW);
+ if(pressed&IN_SHOULDER)begin(f,SHOULDER);
+ else if((in&(IN_PUNCH|IN_GUARD))==(IN_PUNCH|IN_GUARD) && (pressed&(IN_PUNCH|IN_GUARD)))begin(f,THROW);
  else if(pressed&IN_KICK)begin(f,f->crouch?LOW_KICK:((in&IN_PUNCH)?LAUNCH_KICK:KICK));
  else if(pressed&IN_PUNCH)begin(f,PUNCH);
  else if(pressed&IN_JUMP)begin(f,JUMP);
@@ -70,7 +75,7 @@ static void advance(Fighter*f,Fighter*other,uint16_t in){
 typedef struct {int hit,damage,push,stun,blocked,knock,dx,dz;} Contact;
 static Contact contact(Fighter*a,Fighter*b){
  Contact c={0};const Move*m;int d,dot;
- if(a->action<PUNCH||a->action>THROW||a->landed)return c;
+ if(a->action<PUNCH||a->action>SHOULDER||a->landed)return c;
  m=&game_moves[a->action];
  if(a->tick<m->startup||a->tick>=m->startup+m->active)return c;
  d=game_distance(a,b);if(d>m->reach)return c;
@@ -85,7 +90,7 @@ static Contact contact(Fighter*a,Fighter*b){
  c.damage=c.blocked?0:m->damage+(a->character?2:0);
  c.push=c.blocked?m->push/3:m->push;
  c.stun=c.blocked?8:m->stun;
- c.knock=!c.blocked&&(a->action==LAUNCH_KICK||a->action==THROW);
+ c.knock=!c.blocked&&(a->action==LAUNCH_KICK||a->action==THROW||a->action==SHOULDER);
  a->landed=1;return c;
 }
 static void apply(Game*g,Fighter*b,Contact c){
@@ -115,7 +120,7 @@ void game_tick(Game*g,uint16_t p1,uint16_t p2){
   }return;
  }
  advance(&g->f[0],&g->f[1],p1);advance(&g->f[1],&g->f[0],p2);
- for(i=0;i<2;i++)if(g->f[i].action>=PUNCH&&g->f[i].action<=THROW&&!g->f[i].tick)g->events|=EV_SWING;
+ for(i=0;i<2;i++)if(g->f[i].action>=PUNCH&&g->f[i].action<=SHOULDER&&!g->f[i].tick)g->events|=EV_SWING;
  /* Evaluate both contacts before applying either: same-frame strikes trade. */
  a=contact(&g->f[0],&g->f[1]);b=contact(&g->f[1],&g->f[0]);
  if((a.hit&&g->f[0].action==THROW)||(b.hit&&g->f[1].action==THROW))g->events|=EV_THROW;
@@ -145,9 +150,10 @@ uint16_t game_cpu(Game*g,int player,int difficulty){
   int side=(-a->z*a->dx+a->x*a->dz)>0;
   return (a->x>0?IN_LEFT:IN_RIGHT)|(side?IN_STEP_R:IN_STEP_L);
  }
- if(b->action>=PUNCH&&b->action<=LAUNCH_KICK && (int)(r%100)<35+difficulty*15)
+ if(b->action>=PUNCH&&b->action<=SHOULDER && (int)(r%100)<35+difficulty*15)
   return IN_GUARD|(b->action==LOW_KICK?IN_DOWN:0);
  if(d>220)return b->x>a->x?IN_RIGHT:IN_LEFT;
+ if(r%19==0)return IN_SHOULDER;
  if(r%13==0)return IN_GUARD|IN_PUNCH;
  if(r%11==0)return IN_DOWN|IN_KICK;
  if(r%17==0)return IN_PUNCH|IN_KICK;
