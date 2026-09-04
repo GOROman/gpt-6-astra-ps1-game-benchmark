@@ -57,3 +57,21 @@ GitHub Actions の `f556430` ビルドを DuckStation で実行。8角断面の�
 | ポーズ中 SELECT | タイトルへ戻る |
 
 立ちガードは上・中段、しゃがみガードは下段を防ぎます。投げは立ちガードを崩し、しゃがみで回避できます。ショルダータックルは近距離から踏み込み、相手を大きく押し出します。立ちガードで防げます。
+
+## ビルド・起動
+
+PS1 ビルドは GitHub Actions の **PS1 build** で行います。Push ごとに戦闘テストを実行し、固定版 PSn00bSDK v0.24 で `facet.exe` と `facet.bin` / `facet.cue` を生成します。
+
+```sh
+# ローカルで戦闘ルールを検証
+./tools/test.sh
+
+# 手動で GitHub Actions を起動
+gh workflow run build.yml
+gh run list --workflow build.yml
+
+# 成功した run ID の成果物を取得（ID を実際の番号に置き換える）
+gh run download RUN_ID -n facet-ps1 -D build/download
+```
+
+`facet.cue` を、同じフォルダに `facet.bin` を置いた状態で DuckStation に読み込みます。更新時は既存の1インスタンスで再読み込み／ゲーム再起動を使用します。完成後に `v*` タグを作成すると、Actions がタグのソースを再ビルドして Release に ZIP・BIN/CUE・EXE・チェックサムを公開します。現時点では受け入れ検証中です。

@@ -42,3 +42,25 @@ jobs:
             build/facet.elf
             build/SHA256SUMS
           if-no-files-found: error
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: facet-ps1
+          path: release
+      - name: Package verified build and publish tagged release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          cp README.md docs/CONTROLS.md release/
+          cd release
+          sha256sum -c SHA256SUMS
+          zip "facet-fighter-${RELEASE_TAG}.zip" facet.bin facet.cue facet.exe SHA256SUMS README.md CONTROLS.md
+          gh release create "$RELEASE_TAG" --verify-tag --title "FACET FIGHTER ${RELEASE_TAG}" --notes-file ../docs/RELEASE_NOTES.md "facet-fighter-${RELEASE_TAG}.zip" facet.bin facet.cue facet.exe SHA256SUMS
