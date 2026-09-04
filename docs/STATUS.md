@@ -6,7 +6,7 @@
 - [x] Native PS1 build: EXE and bootable BIN/CUE.
 - [x] Flat-shaded articulated 3D fighters and raised arena rendered in emulator at 60 FPS.
 - [ ] Title, selection, CPU play, two-player versus, pause and result screen.
-- [ ] Audible attack / hit / round cues.
+- [x] SPU attack / hit / round output captured from the emulator (audio sample linked below).
 - [ ] Emulator playthrough and two-controller input verified.
 - [ ] Build instructions, controls and evidence published.
 - [ ] Completion tag and GitHub Release artifacts published.
@@ -27,3 +27,5 @@ GitHub Actions run [33926563885](https://github.com/GOROman/gpt-6-astra-ps1-game
 DuckStation: camera sign error fixed; articulated flat-shaded fighters and raised arena verified visually at approximately 60 FPS. See [implementation history](IMPLEMENTATION.md).
 
 2026-09-05 `f556430`: two CPU fighters with octagonal geometry, fixed-length arms, tracking camera and HUD rendered at 59.82 FPS / 59.82 VPS (60 FPS NTSC class). This is an observed sample, not yet a worst-case sustained performance audit.
+
+SPU verification (`f556430`): 70.615 seconds of emulator-native stereo PCM at 44,100 Hz, peak 11,236 / 32,768, RMS 1,510.89, 1,203,880 nonzero samples. [18-second sample](audio/facet-spu-demo.ogg). This verifies emulator audio output, not the physical speaker or a real PS1.

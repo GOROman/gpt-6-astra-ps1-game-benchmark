@@ -50,3 +50,9 @@
 ![新モデル、カメラ、上部HUD、固定長の腕、60 FPS](screenshots/004-camera-hud-fixed-arms-60fps.png)
 
 [Actions build 33927965929](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33927965929)。エミュレーター1インスタンス内で CUE を再読み込み。持続的な最悪条件の性能確認、2P操作、全メニューとサウンドの受け入れ検証は引き続き必要。
+
+## SPU音声の録音検証 — 2026-09-05
+
+`f556430` のCPU対戦を同じDuckStationインスタンスで70.615秒録音。44.1kHzステレオPCMの非ゼロ出力を確認。攻撃・衝突・ラウンド音をコードと出力信号で確認した。物理スピーカー／PS1実機の確認ではない。
+
+[録音の18秒抜粋（OGG）](audio/facet-spu-demo.ogg)

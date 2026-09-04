@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="650" height="72" viewBox="0 0 650 72" role="img" aria-label="Development progress: 50 percent, 5 of 10 verified milestones">
-  <rect width="650" height="72" rx="10" fill="#101c2e"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="72" viewBox="0 0 660 72" role="img" aria-label="Development progress: 60 percent, 6 of 10 verified milestones">
+  <rect width="660" height="72" rx="10" fill="#101c2e"/>
   <text x="18" y="25" fill="#eff6ff" font-family="sans-serif" font-size="14" font-weight="bold">FACET FIGHTER · DEVELOPMENT</text>
-  <text x="620" y="25" text-anchor="end" fill="#56ddba" font-family="sans-serif" font-size="14" font-weight="bold">50% · 5 / 10</text>
+  <text x="620" y="25" text-anchor="end" fill="#56ddba" font-family="sans-serif" font-size="14" font-weight="bold">60% · 6 / 10</text>
   <rect x="18" y="41" width="604" height="13" rx="6.5" fill="#2c3c53"/>
-  <rect x="18" y="41" width="302" height="13" rx="6.5" fill="#56ddba"/>
+  <rect x="18" y="41" width="362.4" height="13" rx="6.5" fill="#56ddba"/>
 </svg>

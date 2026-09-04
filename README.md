@@ -1,8 +1,8 @@
 # FACET FIGHTER — PlayStation 1
 
-[![Development progress: 50% (5/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
+[![Development progress: 60% (6/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
 
-**進捗: 50% — 10項目中5項目を検証済み。** PS1 ビルドと人体の描画を確認。対戦・サウンドの検証とモデル改善を進行中。完成後にタグ・Release を公開します。
+**進捗: 60% — 10項目中6項目を検証済み。** PS1 ビルドと人体の描画を確認。SPU音声の録音を確認。操作・対戦の受け入れ検証を進行中。完成後にタグ・Release を公開します。
 
 **開発モデル: GPT-6 Astra** — Codex 上で段階的に開発し、タスク単位で commit & push しています。ユーザーの指示履歴は [PROMPTS.md](PROMPTS.md) に時刻付きで記録します。
 
@@ -75,3 +75,5 @@ gh run download RUN_ID -n facet-ps1 -D build/download
 ```
 
 `facet.cue` を、同じフォルダに `facet.bin` を置いた状態で DuckStation に読み込みます。更新時は既存の1インスタンスで再読み込み／ゲーム再起動を使用します。完成後に `v*` タグを作成すると、Actions がタグのソースを再ビルドして Release に ZIP・BIN/CUE・EXE・チェックサムを公開します。現時点では受け入れ検証中です。
+
+[エミュレーターで録音した効果音（18秒・OGG）](docs/audio/facet-spu-demo.ogg)
