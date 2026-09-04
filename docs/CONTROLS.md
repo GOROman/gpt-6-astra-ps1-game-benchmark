@@ -14,6 +14,7 @@ Use a PlayStation digital controller, or a DualShock with its D-pad.
 | Square + Triangle | Heavy kick |
 | R2 | Shoulder ram: advancing mid attack, knockdown, strong pushback |
 | L1 / R1 | Circle the opponent |
+| L2 or tap back twice | Backstep |
 | Start | Confirm / Pause or resume |
 | Select while paused | Return to title |
 
