@@ -3,13 +3,19 @@
 #include "sound.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <psxapi.h>
 #include <psxpad.h>
 #include <psxetc.h>
 
 enum ScreenMode { TITLE, SELECT, PLAY, RESULT, HELP };
 static uint8_t pads[2][34];
-static uint16_t read_pad(int n){PADTYPE*p=(PADTYPE*)pads[n];return p->stat==0?(uint16_t)~p->btn:0;}
+static uint16_t read_pad(int n){
+ const PADTYPE*p=(const PADTYPE*)pads[n];
+ if(p->stat||p->len<1)return 0;
+ if(p->type!=PAD_ID_DIGITAL&&p->type!=PAD_ID_ANALOG&&p->type!=PAD_ID_ANALOG_STICK)return 0;
+ return (uint16_t)~p->btn;
+}
 static uint16_t commands(uint16_t p){
  uint16_t i=0;
  if(p&PAD_LEFT)i|=IN_LEFT;if(p&PAD_RIGHT)i|=IN_RIGHT;
@@ -54,7 +60,7 @@ int main(void){
  Game game;int screen=TITLE,choice=0,versus=0,frame=0,idle=0,paused=0,stage=1,demo=0;
  int last_vblank=0;
  int chars[2]={0,1};uint16_t previous[2]={0,0};
- render_init();sound_init();InitPAD(pads[0],34,pads[1],34);StartPAD();ChangeClearPAD(0);
+ render_init();sound_init();memset(pads,0xff,sizeof(pads));InitPAD(pads[0],34,pads[1],34);StartPAD();ChangeClearPAD(0);
  last_vblank=VSync(-1);
  game_init(&game,0,1,1);printf("FACET boot: native PS1\n");
  for(;;){
