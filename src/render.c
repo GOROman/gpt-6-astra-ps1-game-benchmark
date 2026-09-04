@@ -103,7 +103,8 @@ static void fighter(const Fighter*f,int frame){
  int crouch=f->crouch?85:0,phase=frame%32,wave=(phase<16?phase:32-phase)-8;
  int stride=f->walk?wave*6:0,bob=f->walk?(wave<0?-wave:wave):0;
  int extend=0,kick=0,low=0;
- Color skin=color(198,143,102),cloth=f->character?color(34,126,155):color(204,63,43);
+ Color skin=color(198,143,102),cloth=f->character?color(34,126,155):color(211,204,183);
+ Color wraps=f->character?color(30,75,89):color(172,39,31);
  Color dark=color(30,35,48),top=f->character?color(40,55,74):color(207,203,180);
  V hip=v(0,205-crouch,0),neck=v(8,344-crouch+bob,0);
  V shoulder[2],elbow[2],hand[2],knee[2],foot[2];int i;
@@ -158,13 +159,30 @@ static void fighter(const Fighter*f,int frame){
   tapered(f,knee[i],foot[i],25,24,16,18,cloth);
   limb(f,v(foot[i].x-10,foot[i].y,foot[i].z),v(foot[i].x+38,foot[i].y+2,foot[i].z),14,25,dark);
   tapered(f,shoulder[i],elbow[i],25,25,17,18,skin);tapered(f,elbow[i],hand[i],19,20,12,13,skin);
-  limb(f,hand[i],v(hand[i].x+21,hand[i].y,hand[i].z),20,21,cloth);
+  limb(f,hand[i],v(hand[i].x+18,hand[i].y,hand[i].z),17,18,skin);
+  limb(f,v(hand[i].x-7,hand[i].y,hand[i].z),hand[i],16,18,wraps);
  }
  limb(f,v(neck.x,neck.y,0),v(neck.x,neck.y+20,0),17,21,skin);
- limb(f,v(neck.x+6,neck.y+20,0),v(neck.x+6,neck.y+73,0),31,33,skin);
+ tapered(f,v(neck.x+7,neck.y+19,0),v(neck.x+4,neck.y+69,0),23,24,32,33,skin);
  limb(f,v(neck.x+2,neck.y+66,0),v(neck.x+2,neck.y+83,0),33,35,dark);
- /* Dark brows across the forward plane identify face orientation. */
- limb(f,v(neck.x+39,neck.y+54,-23),v(neck.x+39,neck.y+59,23),2,4,dark);
+ /* Angular nose and two brows give the face a readable forward profile. */
+ quad(world(f,v(neck.x+37,neck.y+57,-6)),world(f,v(neck.x+48,neck.y+43,-4)),
+  world(f,v(neck.x+37,neck.y+57,6)),world(f,v(neck.x+48,neck.y+43,4)),color(221,166,119));
+ for(i=0;i<2;i++){
+  int side=i?1:-1;
+  quad(world(f,v(neck.x+35,neck.y+60,side*9)),world(f,v(neck.x+35,neck.y+60,side*24)),
+   world(f,v(neck.x+36,neck.y+55,side*9)),world(f,v(neck.x+36,neck.y+55,side*24)),dark);
+ }
+ if(!f->character){
+  /* Crossed gi lapels, a red headband, and two black belt ends. */
+  quad(world(f,v(34,331-crouch,-29)),world(f,v(37,322-crouch,-38)),
+   world(f,v(35,269-crouch,26)),world(f,v(35,257-crouch,17)),color(244,234,205));
+  quad(world(f,v(35,331-crouch,29)),world(f,v(37,322-crouch,38)),
+   world(f,v(35,269-crouch,-26)),world(f,v(35,257-crouch,-17)),color(162,153,133));
+  limb(f,v(neck.x+3,neck.y+64,0),v(neck.x+3,neck.y+71,0),34,35,wraps);
+  limb(f,v(36,201-crouch,-8),v(45,155-crouch,-16),5,7,dark);
+  limb(f,v(36,201-crouch,8),v(50,161-crouch,20),5,7,dark);
+ }
 }
 void render_init(void){int i;
  ResetGraph(0);SetVideoMode(0);FntLoad(960,0);
