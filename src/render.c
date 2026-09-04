@@ -22,7 +22,7 @@ static Screen project(V p){
  /* Fixed 22-degree downward camera. Positive world Y is up. */
  s.z=camera+(z*950-p.y*380)/1024;
  if(s.z<160)s.z=160;
- s.x=160+x*420/s.z;s.y=153+(z*380-p.y*950)*420/1024/s.z;
+ s.x=160+x*420/s.z;s.y=153+(-z*380-p.y*950)*420/1024/s.z;
  return s;
 }
 static void quad(V a,V b,V c,V d,Color col){
