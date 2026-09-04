@@ -22,6 +22,8 @@ Each completed step is committed and pushed separately. Completion is tracked in
 
 ## Tools
 
-PS1 code uses [PSn00bSDK](https://github.com/Lameguy64/PSn00bSDK). The local environment requires PS1 builds on `mac-studio`; no Docker or Colima is used. Portable rule tests run on the development machine using a C compiler.
+PS1 code uses [PSn00bSDK](https://github.com/Lameguy64/PSn00bSDK). PS1 builds run on GitHub Actions. Portable rule tests run on the development machine using a C compiler.
 
 No BIOS, commercial game assets or SDK binaries are included.
+
+Run portable rule tests with `./tools/test.sh`.

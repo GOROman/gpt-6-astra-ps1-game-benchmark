@@ -1,8 +1,8 @@
 # Acceptance and current state
 
 - [x] Public repository, original game specification, incremental history.
-- [ ] Deterministic combat: attacks, guarding, crouch/jump, throws, hit reactions.
-- [ ] Rules tested: KO, ring-out, timeout, draw, first-to-two and rematch.
+- [x] Deterministic combat: attacks, guarding, crouch/jump, throws, hit reactions.
+- [x] Rules tested: KO, ring-out, timeout, draw, first-to-two and rematch.
 - [ ] Native PS1 build: EXE and bootable BIN/CUE.
 - [ ] Flat-shaded articulated 3D fighters and raised arena rendered in emulator.
 - [ ] Title, selection, CPU play, two-player versus, pause and result screen.
@@ -16,3 +16,7 @@ Physical-console testing must be reported separately from emulator testing.
 
 2026-09-05: Empty local repository at task start. Origin existed as private.
 SSH to `mac-studio` timed out; `mac-studio.local` did not resolve. Continue independent implementation and recheck the build host before integration.
+
+Portable combat tests pass under AddressSanitizer and UndefinedBehaviorSanitizer, including 20,000 deterministic CPU simulation frames. This does not yet verify PS1 runtime behavior.
+
+Build direction updated by user: GitHub Actions builds; tag and GitHub Release only after completion.
