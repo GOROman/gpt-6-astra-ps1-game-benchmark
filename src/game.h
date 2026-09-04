@@ -10,8 +10,8 @@
 
 enum Input { IN_LEFT=1, IN_RIGHT=2, IN_UP=4, IN_DOWN=8,
  IN_PUNCH=16, IN_KICK=32, IN_GUARD=64, IN_JUMP=128,
- IN_STEP_L=256, IN_STEP_R=512, IN_SHOULDER=1024 };
-enum Action { IDLE, PUNCH, KICK, LOW_KICK, LAUNCH_KICK, THROW, SHOULDER, HURT, DOWN, JUMP };
+ IN_STEP_L=256, IN_STEP_R=512, IN_SHOULDER=1024, IN_BACKSTEP=2048 };
+enum Action { IDLE, PUNCH, KICK, LOW_KICK, LAUNCH_KICK, THROW, SHOULDER, HURT, DOWN, JUMP, BACKSTEP };
 enum Phase { INTRO, FIGHT, ROUND_OVER, MATCH_OVER };
 enum Reason { NONE, KO, RING_OUT, TIME_UP, DRAW };
 enum Event { EV_SWING=1, EV_HIT=2, EV_BLOCK=4, EV_THROW=8, EV_ROUND=16 };
@@ -20,7 +20,7 @@ typedef struct { int startup, active, recovery, damage, reach, push, stun, level
 typedef struct {
  int x,z,y, vx,vz, hp, wins, character;
  int dx,dz; /* unit facing vector, 1024 == 1 */
- int action,tick,stun,landed,crouch,guard, walk;
+ int action,tick,stun,landed,crouch,guard, walk,back_tap;
  uint16_t previous;
 } Fighter;
 typedef struct {

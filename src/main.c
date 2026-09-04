@@ -23,6 +23,7 @@ static uint16_t commands(uint16_t p){
  if(p&PAD_SQUARE)i|=IN_PUNCH;if(p&PAD_TRIANGLE)i|=IN_KICK;
  if(p&PAD_CROSS)i|=IN_GUARD;
  if(p&PAD_R2)i|=IN_SHOULDER;
+ if(p&PAD_L2)i|=IN_BACKSTEP;
  if(p&PAD_CIRCLE)i|=IN_PUNCH|IN_GUARD;
  if(p&PAD_L1)i|=IN_STEP_L;if(p&PAD_R1)i|=IN_STEP_R;
  return i;
@@ -124,7 +125,7 @@ int main(void){
    render_center(202,"LEFT/RIGHT TO CHANGE");render_center(218,"START: FIGHT   SELECT: BACK");
   }else if(screen==HELP){
    render_center(26,"HOW TO PLAY");
-   render_text(24,52,"LEFT/RIGHT   MOVE\nDOWN         CROUCH\nUP           JUMP\nSQUARE       PUNCH (HIGH)\nTRIANGLE     KICK (MID)\nCROSS        GUARD\nCIRCLE       THROW (P+G)\nDOWN+KICK    LOW KICK\nPUNCH+KICK   HEAVY KICK\nL1 / R1      CIRCLE RIVAL\nR2           SHOULDER RAM\nSTART        PAUSE");
+   render_text(24,52,"LEFT/RIGHT   MOVE\nDOWN         CROUCH\nUP           JUMP\nSQUARE       PUNCH (HIGH)\nTRIANGLE     KICK (MID)\nCROSS        GUARD\nCIRCLE       THROW (P+G)\nDOWN+KICK    LOW KICK\nPUNCH+KICK   HEAVY KICK\nL1 / R1      CIRCLE RIVAL\nR2           SHOULDER RAM\nL2           BACKSTEP\nSTART        PAUSE");
    render_center(154,"KO / RING OUT / 30 SECOND LIMIT");
    render_center(170,"FIRST TO TWO ROUNDS WINS");render_center(186,"GUARD LOW: DOWN+CROSS");
    render_center(218,"START TO RETURN");render_rect(12,18,296,212,12,20,33);

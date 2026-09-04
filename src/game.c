@@ -39,10 +39,16 @@ void game_init(Game*g,int c1,int c2,uint32_t seed){
 static void begin(Fighter*f,int action){f->action=action;f->tick=0;f->landed=0;f->guard=0;}
 static void advance(Fighter*f,Fighter*other,uint16_t in,int player){
  unsigned pressed=in&~f->previous;f->previous=in;f->walk=0;
+ if(f->back_tap)f->back_tap--;
  f->x+=f->vx;f->z+=f->vz;f->vx=f->vx*3/4;f->vz=f->vz*3/4;
  if(f->stun){
   f->stun--;f->tick++;f->guard=0;f->crouch=0;
   if(!f->stun){f->action=IDLE;f->tick=0;}return;
+ }
+ if(f->action==BACKSTEP){
+  int speed=f->tick<6?12:f->tick<12?8:3;
+  f->x-=f->dx*speed/1024;f->z-=f->dz*speed/1024;
+  f->tick++;if(f->tick>=18){f->action=IDLE;f->tick=0;}return;
  }
  if(f->action==JUMP){
   f->tick++;f->y=f->tick*(36-f->tick)/2;
@@ -57,7 +63,12 @@ static void advance(Fighter*f,Fighter*other,uint16_t in,int player){
   return;
  }
  face(f,other);f->crouch=!!(in&IN_DOWN);f->guard=!!(in&IN_GUARD);
- if(pressed&IN_SHOULDER)begin(f,SHOULDER);
+ if(pressed&(player?IN_RIGHT:IN_LEFT)){
+  if(f->back_tap){pressed|=IN_BACKSTEP;f->back_tap=0;}
+  else f->back_tap=12;
+ }
+ if(pressed&IN_BACKSTEP){begin(f,BACKSTEP);f->crouch=0;}
+ else if(pressed&IN_SHOULDER)begin(f,SHOULDER);
  else if((in&(IN_PUNCH|IN_GUARD))==(IN_PUNCH|IN_GUARD) && (pressed&(IN_PUNCH|IN_GUARD)))begin(f,THROW);
  else if(pressed&IN_KICK)begin(f,f->crouch?LOW_KICK:((in&IN_PUNCH)?LAUNCH_KICK:KICK));
  else if(pressed&IN_PUNCH)begin(f,PUNCH);
@@ -156,6 +167,7 @@ uint16_t game_cpu(Game*g,int player,int difficulty){
  if(b->action>=PUNCH&&b->action<=SHOULDER && (int)(r%100)<35+difficulty*15)
   return IN_GUARD|(b->action==LOW_KICK?IN_DOWN:0);
  if(d>220)return player?IN_LEFT:IN_RIGHT;
+ if(d<150&&r%23==0)return IN_BACKSTEP;
  if(r%19==0)return IN_SHOULDER;
  if(r%13==0)return IN_GUARD|IN_PUNCH;
  if(r%11==0)return IN_DOWN|IN_KICK;

@@ -30,6 +30,13 @@ int main(void){
  start(150);g.f[0].x=RING_EDGE+1;game_tick(&g,0,0);assert(g.reason==RING_OUT&&g.winner==1);
  start(150);g.remaining=1;g.f[0].hp=90;game_tick(&g,0,0);assert(g.reason==TIME_UP&&g.winner==1);
  start(150);g.remaining=1;game_tick(&g,0,0);assert(g.reason==DRAW&&g.winner==-1);
+ start(400);game_tick(&g,IN_BACKSTEP,0);ticks(18,0,0);
+ assert(g.f[0].x<-300&&g.f[0].action==IDLE);
+ start(400);game_tick(&g,IN_LEFT,0);game_tick(&g,0,0);game_tick(&g,IN_LEFT,0);
+ assert(g.f[0].action==BACKSTEP);
+ start(400);game_tick(&g,0,IN_RIGHT);game_tick(&g,0,0);game_tick(&g,0,IN_RIGHT);
+ assert(g.f[1].action==BACKSTEP);
+ start(400);ticks(10,IN_DOWN,0);assert(g.f[0].crouch);game_tick(&g,0,0);assert(!g.f[0].crouch);
  /* With fighters aligned in depth, both screen-relative inputs approach. */
  start(400);g.f[0].x=g.f[1].x=0;g.f[0].z=-200;g.f[1].z=200;
  ticks(10,IN_RIGHT,IN_LEFT);assert(game_distance(&g.f[0],&g.f[1])<320);
