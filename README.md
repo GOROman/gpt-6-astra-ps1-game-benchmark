@@ -76,4 +76,4 @@ gh run download RUN_ID -n facet-ps1 -D build/download
 
 `facet.cue` を、同じフォルダに `facet.bin` を置いた状態で DuckStation に読み込みます。更新時は既存の1インスタンスで再読み込み／ゲーム再起動を使用します。完成後に `v*` タグを作成すると、Actions がタグのソースを再ビルドして Release に ZIP・BIN/CUE・EXE・チェックサムを公開します。現時点では受け入れ検証中です。
 
-[エミュレーターで録音した効果音（18秒・OGG）](docs/audio/facet-spu-demo.ogg)
+[エミュレーターで録音した効果音（18秒・FLAC）](docs/audio/facet-spu-demo.flac)

@@ -55,4 +55,4 @@
 
 `f556430` のCPU対戦を同じDuckStationインスタンスで70.615秒録音。44.1kHzステレオPCMの非ゼロ出力を確認。攻撃・衝突・ラウンド音をコードと出力信号で確認した。物理スピーカー／PS1実機の確認ではない。
 
-[録音の18秒抜粋（OGG）](audio/facet-spu-demo.ogg)
+[録音の18秒抜粋（FLAC）](audio/facet-spu-demo.flac)

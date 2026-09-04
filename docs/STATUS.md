@@ -28,4 +28,4 @@ DuckStation: camera sign error fixed; articulated flat-shaded fighters and raise
 
 2026-09-05 `f556430`: two CPU fighters with octagonal geometry, fixed-length arms, tracking camera and HUD rendered at 59.82 FPS / 59.82 VPS (60 FPS NTSC class). This is an observed sample, not yet a worst-case sustained performance audit.
 
-SPU verification (`f556430`): 70.615 seconds of emulator-native stereo PCM at 44,100 Hz, peak 11,236 / 32,768, RMS 1,510.89, 1,203,880 nonzero samples. [18-second sample](audio/facet-spu-demo.ogg). This verifies emulator audio output, not the physical speaker or a real PS1.
+SPU verification (`f556430`): 70.615 seconds of emulator-native stereo PCM at 44,100 Hz, peak 11,236 / 32,768, RMS 1,510.89, 1,203,880 nonzero samples. [18-second sample](audio/facet-spu-demo.flac). This verifies emulator audio output, not the physical speaker or a real PS1.
