@@ -60,7 +60,7 @@ int main(void){
  for(;;){
   uint16_t p[2]={read_pad(0),read_pad(1)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
   int now=VSync(-1),steps=now-last_vblank;
-  int i,oldphase=game.phase;last_vblank=now;
+  int i,oldphase=game.phase,oldscreen=screen;last_vblank=now;
   if(steps<1)steps=1;
   if(steps>4)steps=4;
   previous[0]=p[0];previous[1]=p[1];frame=(frame+steps)&32767;
@@ -99,6 +99,9 @@ int main(void){
   }else if(screen==RESULT){
    if(edge[0]&PAD_START){stage=1;game_init(&game,chars[0],versus?chars[1]:chars[0]^1,(unsigned)frame+1);screen=PLAY;}
    if(edge[0]&PAD_SELECT){screen=TITLE;idle=0;}
+  }
+  if(screen!=oldscreen&&(screen==TITLE||screen==SELECT)){
+   game_init(&game,chars[0],versus?chars[1]:chars[0]^1,(unsigned)frame+1);
   }
   if(screen==SELECT){game.f[0].character=chars[0];game.f[1].character=versus?chars[1]:chars[0]^1;}
   render_begin(&game,frame,screen==TITLE||screen==HELP?0:screen==SELECT?1:2);render_scene(&game,frame);
