@@ -1,0 +1,1 @@
+{"version":3,"configurePresets":[{"name":"default","generator":"Ninja","toolchainFile":"$env{PSN00BSDK_LIBS}/cmake/sdk.cmake","binaryDir":"${sourceDir}/build","cacheVariables":{"CMAKE_BUILD_TYPE":"Release","PSN00BSDK_TARGET":"mipsel-none-elf"}}]}

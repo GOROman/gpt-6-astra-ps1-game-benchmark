@@ -1,0 +1,44 @@
+name: PS1 build
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify combat rules
+        run: ./tools/test.sh
+      - name: Install PSn00bSDK v0.24
+        shell: bash
+        run: |
+          curl -fL --retry 3 https://github.com/Lameguy64/PSn00bSDK/releases/download/v0.24/PSn00bSDK-0.24-Linux.zip -o "$RUNNER_TEMP/sdk.zip"
+          mkdir -p "$RUNNER_TEMP/psn00bsdk"
+          unzip -q "$RUNNER_TEMP/sdk.zip" -d "$RUNNER_TEMP/psn00bsdk"
+          SDK_CMAKE=$(find "$RUNNER_TEMP/psn00bsdk" -path '*/cmake/sdk.cmake' -print -quit)
+          SDK_LIBS=$(dirname "$(dirname "$SDK_CMAKE")")
+          echo "PSN00BSDK_LIBS=$SDK_LIBS" >> "$GITHUB_ENV"
+          find "$RUNNER_TEMP/psn00bsdk" -type d -name bin >> "$GITHUB_PATH"
+          sudo apt-get update -qq
+          sudo apt-get install -y ninja-build
+      - name: Build native PlayStation executable and disc
+        run: |
+          cmake --preset default
+          cmake --build build
+          test -s build/facet.exe
+          test -s build/facet.bin
+          test -s build/facet.cue
+          cd build
+          sha256sum facet.exe facet.bin facet.cue > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: facet-ps1
+          path: |
+            build/facet.exe
+            build/facet.bin
+            build/facet.cue
+            build/facet.elf
+            build/SHA256SUMS
+          if-no-files-found: error
