@@ -36,9 +36,9 @@ Run portable rule tests with `./tools/test.sh`.
 
 ## 最新の実行画面
 
-![PS1 emulator: polygon fighters after camera fix](docs/screenshots/004-camera-hud-fixed-arms-60fps.png)
+![PS1 emulator: polygon fighters after camera fix](docs/screenshots/005-ko-interpolation.png)
 
-GitHub Actions の `f556430` ビルドを DuckStation で実行。8角断面の人体・固定長の腕・新カメラ・上部HUDを統合。CPU対戦の描画 **60 FPS（実測59.82 FPS）** を確認。実機確認とは区別しています。
+GitHub Actions の `53abc22` ビルドを、同じDuckStationインスタンスでCUEを開き直して実行。バックステップ・ヒットストップ・火花・揺れ・関節補間を追加した版のKO場面です。対戦／KO時に **59.82 FPS** を観測。実機確認とは区別しています。
 
 [スクリーンショット付き実装履歴](docs/IMPLEMENTATION.md)
 
@@ -79,4 +79,4 @@ gh run download RUN_ID -n facet-ps1 -D build/download
 
 [エミュレーターで録音した効果音（18秒・FLAC）](docs/audio/facet-impact-demo.flac)
 
-打撃時は3フレーム、強打は6フレームのヒットストップ。ガード時は2フレーム。接触位置の火花とダメージに応じた画面揺れを表示します。構え・しゃがみ・攻撃は関節角度を補間し、手足の長さを維持します（最新版の実行確認は進行中）。
+打撃時は3フレーム、強打は6フレームのヒットストップ。ガード時は2フレーム。接触位置の火花とダメージに応じた画面揺れを表示します。構え・しゃがみ・攻撃は関節角度を補間し、手足の長さを維持します。
