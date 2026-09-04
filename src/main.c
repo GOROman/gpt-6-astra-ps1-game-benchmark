@@ -14,13 +14,13 @@
 
 enum ScreenMode { TITLE, SELECT, PLAY, RESULT, HELP };
 static uint8_t pads[2][34];
-static uint16_t read_pad(int n){
+static uint16_t read_pad(int n,int trace){
  const PADTYPE*p=(const PADTYPE*)pads[n];
  static unsigned last[2]={0xffffffffu,0xffffffffu};
  unsigned state=(unsigned)pads[n][0]|((unsigned)pads[n][1]<<8)|((unsigned)p->btn<<16);
  /* BIOS writes these buffers asynchronously. Log changes only, so a missing
     device, a rejected packet and a missed host key can be distinguished. */
- if(state!=last[n]){
+ if(trace&&state!=last[n]){
   printf("FACET pad%d status=%02x id=%02x buttons=%04x\n",n+1,pads[n][0],pads[n][1],(unsigned)(uint16_t)~p->btn);
   last[n]=state;
  }
@@ -78,19 +78,15 @@ int main(void){
  last_vblank=VSync(-1);
  game_init(&game,0,1,1);printf("FACET boot: native PS1\n");
  for(;;){
-  uint16_t p[2]={read_pad(0),read_pad(1)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
+  uint16_t p[2]={read_pad(0,screen!=PLAY),read_pad(1,screen!=PLAY)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
   int now=VSync(-1),steps=now-last_vblank;
-  int i,oldphase=game.phase,oldscreen=screen;last_vblank=now;
-  /* Measure actual display intervals before catch-up is capped. A 600-frame
-     sample with 600 vblanks and no slow frames sustains the native NTSC rate. */
-  if(steps>0){
+  int i,oldscreen=screen;last_vblank=now;
+  /* Accumulate combat intervals without synchronous TTY writes. Report only
+     after leaving PLAY, so diagnostics cannot stall the measured match. */
+  if(screen==PLAY&&steps>0){
    sample_frames++;sample_vblanks+=steps;
    if(steps>1)slow_frames++;
    if(steps>max_interval)max_interval=steps;
-   if(sample_frames==600){
-    printf("FACET perf frames=%d vblanks=%d slow=%d max=%d\n",sample_frames,sample_vblanks,slow_frames,max_interval);
-    sample_frames=sample_vblanks=slow_frames=max_interval=0;
-   }
   }
   if(steps<1)steps=1;
   if(steps>4)steps=4;
@@ -119,7 +115,6 @@ int main(void){
      game_tick(&game,demo?game_cpu(&game,0,1):commands(p[0]),versus&&!demo?commands(p[1]):game_cpu(&game,1,stage));
      sound_event(game.events);
      }
-     if(oldphase!=game.phase)printf("FACET phase=%d round=%d hp=%d,%d winner=%d reason=%d\n",game.phase,game.round,game.f[0].hp,game.f[1].hp,game.winner,game.reason);
      if(game.phase==MATCH_OVER){
       if(demo){screen=TITLE;idle=0;demo=0;}
       else if(!versus&&game.winner==0&&stage<3){stage++;game_init(&game,chars[0],stage==2?chars[0]:chars[0]^1,(unsigned)frame+1);}
@@ -130,6 +125,13 @@ int main(void){
   }else if(screen==RESULT){
    if(edge[0]&PAD_START){stage=1;game_init(&game,chars[0],versus?chars[1]:chars[0]^1,(unsigned)frame+1);screen=PLAY;}
    if(edge[0]&PAD_SELECT){screen=TITLE;idle=0;}
+  }
+  if(oldscreen!=PLAY&&screen==PLAY){
+   sample_frames=sample_vblanks=slow_frames=max_interval=0;
+   last_vblank=VSync(-1);
+  }
+  if(oldscreen==PLAY&&screen!=PLAY){
+   printf("FACET match frames=%d vblanks=%d slow=%d max=%d winner=%d reason=%d\n",sample_frames,sample_vblanks,slow_frames,max_interval,game.winner,game.reason);
   }
   if(screen!=oldscreen&&(screen==TITLE||screen==SELECT)){
    game_init(&game,chars[0],versus?chars[1]:chars[0]^1,(unsigned)frame+1);
