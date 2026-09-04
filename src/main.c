@@ -72,6 +72,7 @@ static void hud(const Game*g,int versus,int stage){
 int main(void){
  Game game;int screen=TITLE,choice=0,versus=0,frame=0,idle=0,paused=0,stage=1,demo=0;
  int last_vblank=0;
+ int sample_frames=0,sample_vblanks=0,slow_frames=0,max_interval=0;
  int chars[2]={0,1};uint16_t previous[2]={0,0};
  render_init();sound_init();memset(pads,0xff,sizeof(pads));InitPAD(pads[0],34,pads[1],34);StartPAD();ChangeClearPAD(0);
  last_vblank=VSync(-1);
@@ -80,6 +81,17 @@ int main(void){
   uint16_t p[2]={read_pad(0),read_pad(1)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
   int now=VSync(-1),steps=now-last_vblank;
   int i,oldphase=game.phase,oldscreen=screen;last_vblank=now;
+  /* Measure actual display intervals before catch-up is capped. A 600-frame
+     sample with 600 vblanks and no slow frames sustains the native NTSC rate. */
+  if(steps>0){
+   sample_frames++;sample_vblanks+=steps;
+   if(steps>1)slow_frames++;
+   if(steps>max_interval)max_interval=steps;
+   if(sample_frames==600){
+    printf("FACET perf frames=%d vblanks=%d slow=%d max=%d\n",sample_frames,sample_vblanks,slow_frames,max_interval);
+    sample_frames=sample_vblanks=slow_frames=max_interval=0;
+   }
+  }
   if(steps<1)steps=1;
   if(steps>4)steps=4;
   previous[0]=p[0];previous[1]=p[1];frame=(frame+steps)&32767;
