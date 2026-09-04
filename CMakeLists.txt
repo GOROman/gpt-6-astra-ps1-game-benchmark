@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 project(facet LANGUAGES C ASM VERSION 0.1.0)
-psn00bsdk_add_executable(facet GPREL src/main.c src/game.c src/render.c)
+psn00bsdk_add_executable(facet GPREL src/main.c src/game.c src/render.c src/sound.c)
 target_include_directories(facet PRIVATE src)
 target_compile_options(facet PRIVATE -Wall -Wextra)
 psn00bsdk_add_cd_image(iso facet iso.xml DEPENDS facet system.cnf)

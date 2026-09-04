@@ -1,5 +1,6 @@
 #include "game.h"
 #include "render.h"
+#include "sound.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <psxapi.h>
@@ -41,7 +42,7 @@ static void hud(const Game*g,int versus,int stage){
 int main(void){
  Game game;int screen=TITLE,choice=0,versus=0,frame=0,idle=0,paused=0,stage=1,demo=0;
  int chars[2]={0,1};uint16_t previous[2]={0,0};
- render_init();InitPAD(pads[0],34,pads[1],34);StartPAD();ChangeClearPAD(0);
+ render_init();sound_init();InitPAD(pads[0],34,pads[1],34);StartPAD();ChangeClearPAD(0);
  game_init(&game,0,1,1);printf("FACET boot: native PS1\n");
  for(;;){
   uint16_t p[2]={read_pad(0),read_pad(1)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
@@ -66,6 +67,7 @@ int main(void){
     if(paused){if(edge[0]&PAD_SELECT){paused=0;screen=TITLE;idle=0;}}
     else{
      game_tick(&game,demo?game_cpu(&game,0,1):commands(p[0]),versus&&!demo?commands(p[1]):game_cpu(&game,1,stage));
+     sound_event(game.events);
      if(oldphase!=game.phase)printf("FACET phase=%d round=%d hp=%d,%d winner=%d reason=%d\n",game.phase,game.round,game.f[0].hp,game.f[1].hp,game.winner,game.reason);
      if(game.phase==MATCH_OVER){
       if(demo){screen=TITLE;idle=0;demo=0;}
