@@ -25,8 +25,8 @@ static Screen project(V p){
  s.x=160+x*420/s.z;s.y=153+(-z*380-p.y*950)*420/1024/s.z;
  return s;
 }
-static void quad(V a,V b,V c,V d,Color col){
- Screen p[4]={project(a),project(b),project(c),project(d)};
+static void screen_quad(Screen a,Screen b,Screen c,Screen d,Color col){
+ Screen p[4]={a,b,c,d};
  int z=(p[0].z+p[1].z+p[2].z+p[3].z)/16;
  POLY_F4*q;
  if(z<2)z=2;
@@ -35,6 +35,9 @@ static void quad(V a,V b,V c,V d,Color col){
  setPolyF4(q);setRGB0(q,col.r,col.g,col.b);
  setXY4(q,p[0].x,p[0].y,p[1].x,p[1].y,p[2].x,p[2].y,p[3].x,p[3].y);
  addPrim(&buffers[active].ot[z],q);
+}
+static void quad(V a,V b,V c,V d,Color col){
+ screen_quad(project(a),project(b),project(c),project(d),col);
 }
 void render_rect(int x,int y,int w,int h,int r,int g,int b){
  TILE*t=alloc(sizeof(*t));if(!t)return;setTile(t);setXY0(t,x,y);setWH(t,w,h);setRGB0(t,r,g,b);addPrim(&buffers[active].ot[0],t);
@@ -49,8 +52,8 @@ static V world(const Fighter*f,V p){
  if(f->action==DOWN){int t=p.x;p.x=p.y-120;p.y=35-t/4;}
  return v(f->x+(p.x*f->dx-p.z*f->dz)/1024,f->y+p.y,f->z+(p.x*f->dz+p.z*f->dx)/1024);
 }
-static void triangle(V a,V b,V c,Color col){
- Screen p[3]={project(a),project(b),project(c)};
+static void screen_triangle(Screen a,Screen b,Screen c,Color col){
+ Screen p[3]={a,b,c};
  int z=(p[0].z+p[1].z+p[2].z)/12;
  POLY_F3*q;
  if(z<2)z=2;
@@ -66,24 +69,24 @@ static void tapered(const Fighter*f,V a,V b,int wa,int da,int wb,int db,Color co
  static const int ring[8][2]={{1024,0},{724,724},{0,1024},{-724,724},
   {-1024,0},{-724,-724},{0,-1024},{724,-724}};
  static const int light[8]={108,100,82,65,55,65,82,100};
- V p[16];int i,end,dy=b.y-a.y,dx=b.x-a.x;
+ Screen p[16];int i,end,dy=b.y-a.y,dx=b.x-a.x;
  int len=(dx<0?-dx:dx)+(dy<0?-dy:dy);
  if(!len)len=1;
  for(end=0;end<2;end++){
   V point=end?b:a;int width=end?wb:wa,depth=end?db:da;
   for(i=0;i<8;i++){
    int offset=ring[i][0]*width/1024;
-   p[end*8+i]=world(f,v(point.x+dy*offset/len,point.y-dx*offset/len,
-    point.z+ring[i][1]*depth/1024));
+   p[end*8+i]=project(world(f,v(point.x+dy*offset/len,point.y-dx*offset/len,
+    point.z+ring[i][1]*depth/1024)));
   }
  }
  for(i=0;i<8;i++){
   int j=(i+1)%8,l=light[i];
-  quad(p[i],p[j],p[i+8],p[j+8],color(col.r*l/100,col.g*l/100,col.b*l/100));
+  screen_quad(p[i],p[j],p[i+8],p[j+8],color(col.r*l/100,col.g*l/100,col.b*l/100));
  }
  for(i=1;i<7;i++){
-  triangle(p[0],p[i+1],p[i],color(col.r*6/10,col.g*6/10,col.b*6/10));
-  triangle(p[8],p[8+i],p[9+i],col);
+  screen_triangle(p[0],p[i+1],p[i],color(col.r*6/10,col.g*6/10,col.b*6/10));
+  screen_triangle(p[8],p[8+i],p[9+i],col);
  }
 }
 static void limb(const Fighter*f,V a,V b,int width,int depth,Color col){
