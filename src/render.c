@@ -15,6 +15,11 @@ static int shake,shake_strength=2,old_hp=200;
 typedef struct {int x,y,z;} V;
 typedef struct {int x,y,z;} Screen;
 typedef struct {int r,g,b;} Color;
+typedef struct {int initialized,crouch,roll,roll_sin,roll_cos,clock,upper[2],lower[2],thigh[2],shin[2];} MotionPose;
+static MotionPose motion[2],*current_pose;
+static int blend(int a,int b){int d=b-a;return a+(d*3+(d>0?3:-3))/4;}
+static int ease(int t){if(t<0)t=0;if(t>1024)t=1024;return t*t*(3072-2*t)/1048576;}
+
 static Color color(int r,int g,int b){Color c={r,g,b};return c;}
 static V v(int x,int y,int z){V p={x,y,z};return p;}
 static void*alloc(int size){
@@ -54,7 +59,10 @@ void render_text(int x,int y,const char*text){
 }
 void render_center(int y,const char*text){render_text(160-(int)strlen(text)*4,y,text);}
 static V world(const Fighter*f,V p){
- if(f->action==DOWN){int t=p.x;p.x=p.y-120;p.y=35-t/4;}
+ if(current_pose&&current_pose->roll){
+  int angle=current_pose->roll,cs=current_pose->roll_cos,sn=current_pose->roll_sin,u=p.x,h=p.y-120;
+  p.x=(u*cs+h*sn)/4096;p.y=120+(h*cs-u*sn)/4096-angle*80/1024;
+ }
  return v(f->x+(p.x*f->dx-p.z*f->dz)/1024,f->y+p.y,f->z+(p.x*f->dz+p.z*f->dx)/1024);
 }
 static void screen_triangle(Screen a,Screen b,Screen c,Color col){
@@ -99,8 +107,18 @@ static void tapered(const Fighter*f,V a,V b,int wa,int da,int wb,int db,Color co
 static void limb(const Fighter*f,V a,V b,int width,int depth,Color col){
  tapered(f,a,b,width,depth,width*4/5,depth*4/5,col);
 }
-static void fighter(const Fighter*f,int frame){
- int crouch=f->crouch?85:0,phase=frame%32,wave=(phase<16?phase:32-phase)-8;
+static void fighter(const Fighter*f,int frame,int player,int frozen,int reset){
+ MotionPose*pose=&motion[player];int crouch,phase=frame%32,wave=(phase<16?phase:32-phase)-8;
+ current_pose=pose;
+ if(reset||!pose->initialized){
+  int j;memset(pose,0,sizeof(*pose));pose->initialized=1;
+  for(j=0;j<2;j++){pose->upper[j]=-700;pose->lower[j]=480;pose->thigh[j]=-900;pose->shin[j]=-1148;}
+ }
+ if(!frozen){pose->crouch=blend(pose->crouch,f->crouch?85:0);pose->roll=blend(pose->roll,f->action==DOWN?1024:0);}
+ pose->roll_sin=isin(pose->roll);pose->roll_cos=icos(pose->roll);
+ if(!frozen)pose->clock=frame;
+ phase=pose->clock%32;wave=(phase<16?phase:32-phase)-8;
+ crouch=pose->crouch;
  int stride=f->walk?wave*6:0,bob=f->walk?(wave<0?-wave:wave):0;
  int extend=0,kick=0,low=0;
  Color skin=color(198,143,102),cloth=f->character?color(34,126,155):color(211,204,183);
@@ -110,7 +128,8 @@ static void fighter(const Fighter*f,int frame){
  V shoulder[2],elbow[2],hand[2],knee[2],foot[2];int i;
  if(f->action>=PUNCH&&f->action<=SHOULDER){
   const Move*m=&game_moves[f->action];int t=f->tick;
-  extend=t<=m->startup?t*1024/m->startup:1024-(t-m->startup)*1024/(m->active+m->recovery);
+  extend=t<=m->startup?ease(t*1024/m->startup):t<m->startup+m->active?1024:
+   1024-ease((t-m->startup-m->active)*1024/m->recovery);
   if(extend<0)extend=0;
   if(f->action==KICK||f->action==LOW_KICK||f->action==LAUNCH_KICK){kick=extend;extend=0;low=f->action==LOW_KICK;}
  }
@@ -139,14 +158,25 @@ static void fighter(const Fighter*f,int frame){
   else if((i==0||f->action==THROW)&&extend){
    upper+=extend*700/1024;lower-=extend*480/1024;
   }
+  if(!frozen){pose->upper[i]=blend(pose->upper[i],upper);pose->lower[i]=blend(pose->lower[i],lower);}
+  upper=pose->upper[i];lower=pose->lower[i];
   elbow[i]=v(shoulder[i].x+icos(upper)*70/4096,
    shoulder[i].y+isin(upper)*70/4096,shoulder[i].z);
   hand[i]=v(elbow[i].x+icos(lower)*65/4096,
    elbow[i].y+isin(lower)*65/4096,elbow[i].z);
  }
- knee[0].x+=kick*110/1024;knee[0].y+=kick*(low?0:110)/1024;
- foot[0].x+=kick*265/1024;foot[0].y+=kick*(low?40:270)/1024;
- if(f->action==JUMP){knee[0].y+=55;knee[1].y+=55;foot[0].y+=65;foot[1].y+=65;}
+ /* Interpolate leg angles as well: fixed 100/95-unit bones. */
+ for(i=0;i<2;i++){
+  int side=i?1:-1,thigh=-900+crouch*520/85,shin=-1148-crouch*552/85;
+  if(f->walk){thigh+=side*wave*20;shin-=side*wave*12;}
+  if(f->action==BACKSTEP){thigh+=side*isin(f->tick*180)*180/4096;}
+  if(f->action==JUMP){thigh=-500;shin=-1600;}
+  if(i==0&&kick){thigh+=((low?-600:300)-thigh)*kick/1024;shin+=((low?-350:150)-shin)*kick/1024;}
+  if(!frozen){pose->thigh[i]=blend(pose->thigh[i],thigh);pose->shin[i]=blend(pose->shin[i],shin);}
+  thigh=pose->thigh[i];shin=pose->shin[i];
+  knee[i]=v(hip.x+icos(thigh)*100/4096,hip.y+isin(thigh)*100/4096,side*38);
+  foot[i]=v(knee[i].x+icos(shin)*95/4096,knee[i].y+isin(shin)*95/4096,side*38);
+ }
  /* Hip -> waist -> rib cage -> shoulders: an actual torso silhouette. */
  tapered(f,hip,v(2,245-crouch,0),34,49,28,40,top);
  tapered(f,v(2,245-crouch,0),v(6,302-crouch+bob,0),28,40,
@@ -237,7 +267,7 @@ void render_scene(const Game*g,int frame){int x,z,i;
  for(i=0;i<2;i++){
   const Fighter*f=&g->f[i];
   quad(v(f->x-65,3,f->z-55),v(f->x+65,3,f->z-55),v(f->x-65,3,f->z+55),v(f->x+65,3,f->z+55),color(30,40,48));
-  fighter(f,frame);
+  fighter(f,frame,i,g->hitstop>0,g->phase==INTRO&&g->tick<2);
  }
 }
 static void hit_effect(const Game*g,int player){
