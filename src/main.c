@@ -19,15 +19,24 @@ static uint16_t commands(uint16_t p){
  if(p&PAD_L1)i|=IN_STEP_L;if(p&PAD_R1)i|=IN_STEP_R;
  return i;
 }
+static void timer_digit(int x,int y,int digit,int urgent){
+ static const unsigned mask[10]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
+ static const int segment[7][4]={{2,0,8,3},{10,2,3,9},{10,12,3,9},
+  {2,20,8,3},{0,12,3,9},{0,2,3,9},{2,10,8,3}};
+ int n;for(n=0;n<7;n++)if(mask[digit]&(1u<<n))
+  render_rect(x+segment[n][0],y+segment[n][1],segment[n][2],segment[n][3],245,urgent?86:231,urgent?54:172);
+}
 static void hud(const Game*g,int versus,int stage){
  char text[64];int i;
- sprintf(text,"%02d",(g->remaining+59)/60);render_center(22,text);
+ int seconds=(g->remaining+59)/60;
+ timer_digit(144,14,seconds/10,seconds<=10);timer_digit(161,14,seconds%10,seconds<=10);
  for(i=0;i<2;i++){
-  int x=i?181:16;
+  int x=i?188:16,fill=g->f[i].hp*116/100;
   render_text(x,10,game_character_name(g->f[i].character));
-  render_rect(x,25,g->f[i].hp*123/100,8,i?40:222,i?176:84,i?203:58);
-  render_rect(x-1,24,125,10,48,51,62);
-  sprintf(text,"%c %c",g->f[i].wins>0?'*':'o',g->f[i].wins>1?'*':'o');render_text(x,39,text);
+  render_rect(x+(i?116-fill:0),25,fill,11,i?40:222,i?176:84,i?203:58);
+  render_rect(x-1,24,118,13,69,76,91);
+  render_rect(x,41,9,4,g->f[i].wins>0?244:60,g->f[i].wins>0?190:68,60);
+  render_rect(x+14,41,9,4,g->f[i].wins>1?244:60,g->f[i].wins>1?190:68,60);
  }
  sprintf(text,"ROUND %d   %s",g->round,versus?"2P VERSUS":"ARCADE");render_center(218,text);
  if(!versus){sprintf(text,"STAGE %d/3",stage);render_center(204,text);}
