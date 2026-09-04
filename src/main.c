@@ -81,7 +81,7 @@ int main(void){
    if(edge[0]&PAD_SELECT){screen=TITLE;idle=0;}
   }
   if(screen==SELECT){game.f[0].character=chars[0];game.f[1].character=versus?chars[1]:chars[0]^1;}
-  render_begin(&game,frame);render_scene(&game,frame);
+  render_begin(&game,frame,screen==TITLE||screen==HELP?0:screen==SELECT?1:2);render_scene(&game,frame);
   if(screen==TITLE){
    render_center(44,"F A C E T   F I G H T E R");render_center(61,"POLYGON COMBAT / PLAYSTATION");
    render_center(169,choice==0?"> ARCADE <":"  ARCADE  ");

@@ -3,12 +3,15 @@
 #include <string.h>
 #include <psxgpu.h>
 #include <psxetc.h>
+#include <psxgte.h>
 #define OT_SIZE 1024
 #define PACKET_SIZE 65536
 /* Statically allocated, aligned GPU packets: no per-frame heap allocation. */
 typedef struct {DRAWENV draw;DISPENV disp;uint32_t ot[OT_SIZE];uint32_t packet[PACKET_SIZE/4];} Buffer;
 static Buffer buffers[2];static int active;static uint8_t*next;
-static int center_x,center_z,camera;
+static int center_x,center_z,camera=2100;
+static int yaw,pitch=250,yaw_sin,yaw_cos=4096,pitch_sin,pitch_cos;
+static int shake,old_hp=200;
 typedef struct {int x,y,z;} V;
 typedef struct {int x,y,z;} Screen;
 typedef struct {int r,g,b;} Color;
@@ -19,10 +22,12 @@ static void*alloc(int size){
 }
 static Screen project(V p){
  Screen s;int x=p.x-center_x,z=p.z-center_z;
- /* Fixed 22-degree downward camera. Positive world Y is up. */
- s.z=camera+(z*950-p.y*380)/1024;
+ int rx=(x*yaw_cos+z*yaw_sin)/4096;
+ z=(-x*yaw_sin+z*yaw_cos)/4096;
+ s.z=camera+(z*pitch_cos-p.y*pitch_sin)/4096;
  if(s.z<160)s.z=160;
- s.x=160+x*420/s.z;s.y=153+(-z*380-p.y*950)*420/1024/s.z;
+ s.x=160+rx*420/s.z+(shake?((shake&1)?2:-2):0);
+ s.y=184+(-z*pitch_sin-p.y*pitch_cos)*420/4096/s.z;
  return s;
 }
 static void screen_quad(Screen a,Screen b,Screen c,Screen d,Color col){
@@ -149,11 +154,32 @@ void render_init(void){int i;
  }
  active=0;SetDispMask(1);
 }
-void render_begin(const Game*g,int frame){
- int d=game_distance(&g->f[0],&g->f[1]);(void)frame;
+static int heading(int x,int z){
+ int ax=x<0?-x:x,az=z<0?-z:z;
+ int angle=(ax+az)?az*1024/(ax+az):0;
+ if(x<0)angle=2048-angle;
+ return z<0?(-angle)&4095:angle;
+}
+void render_begin(const Game*g,int frame,int presentation){
+ int d=game_distance(&g->f[0],&g->f[1]);
+ int tx=(g->f[0].x+g->f[1].x)/2,tz=(g->f[0].z+g->f[1].z)/2;
+ int angle=heading(g->f[1].x-g->f[0].x,g->f[1].z-g->f[0].z);
+ int zoom=1600+(d>500?(d-500)*3/4:0),tilt=220,delta,hp;
  next=(uint8_t*)buffers[active].packet;ClearOTagR(buffers[active].ot,OT_SIZE);
- center_x=(g->f[0].x+g->f[1].x)/4;center_z=(g->f[0].z+g->f[1].z)/4;
- camera=1850+(d>600?(d-600)/2:0);
+ if(presentation==0){angle=isin(frame*2)*400/4096;zoom=1900;tilt=280;}
+ else if(presentation==1){angle=isin(frame)*180/4096;zoom=1700;tilt=190;}
+ else if(g->phase==INTRO){angle+=(90-g->tick)*4;zoom+= (90-g->tick)*5;tilt=220+(90-g->tick);}
+ else if((g->phase==ROUND_OVER||g->phase==MATCH_OVER)&&g->winner>=0){
+  const Fighter*w=&g->f[g->winner];
+  tx=(tx+w->x*3)/4;tz=(tz+w->z*3)/4;zoom=1400;angle+=280;tilt=160;
+ }
+ delta=((angle-yaw+2048)&4095)-2048;yaw=(yaw+delta/12)&4095;
+ center_x+=(tx-center_x)/10;center_z+=(tz-center_z)/10;
+ camera+=(zoom-camera)/12;pitch+=(tilt-pitch)/12;
+ yaw_sin=isin(yaw);yaw_cos=icos(yaw);pitch_sin=isin(pitch);pitch_cos=icos(pitch);
+ hp=g->f[0].hp+g->f[1].hp;
+ if(presentation==2&&hp<old_hp)shake=6;else if(shake)shake--;
+ old_hp=hp;
 }
 void render_scene(const Game*g,int frame){int x,z,i;
  /* Individual flat tiles make perspective and foot movement readable. */
