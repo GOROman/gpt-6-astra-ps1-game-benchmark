@@ -90,3 +90,11 @@
 600描画フレームごとに、実際に経過したVBlank数、2VBlank以上かかったフレーム数、最大間隔をTTYへ記録。シミュレーションの追いつき処理が間隔を丸める前に計測する。`frames=600 vblanks=600 slow=0 max=1` が、その区間のネイティブNTSC描画レート維持を示す。ホスト側の実時間速度は別途エミュレーター表示で確認する。
 
 入力切り分け: `bc42feb` で1番パッドの `status=00 id=41 buttons=0000`、2番の未接続 `status=ff` を確認。自動キー入力時のボタン変化はまだ観測できていない。
+
+### 継続計測の初回結果 (`83a2c80`)
+
+[Actions run 33930991567](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33930991567) 成功。既存の1インスタンスでCUEを開き直して計測。連続7区間、計4,200描画フレームで9回の2VBlank間隔を検出。スクショの59.82 FPSだけでは全フレーム維持を証明できない。診断ログの出力負荷を含めた原因切り分けが必要。
+
+[計測ログ](frame-audit.txt)
+
+![継続VBlank計測中のCPU対戦](screenshots/006-vblank-audit.png)

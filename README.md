@@ -36,9 +36,9 @@ Run portable rule tests with `./tools/test.sh`.
 
 ## 最新の実行画面
 
-![PS1 emulator: polygon fighters after camera fix](docs/screenshots/005-ko-interpolation.png)
+![継続VBlank計測中のPS1対戦画面](docs/screenshots/006-vblank-audit.png)
 
-GitHub Actions の `53abc22` ビルドを、同じDuckStationインスタンスでCUEを開き直して実行。バックステップ・ヒットストップ・火花・揺れ・関節補間を追加した版のKO場面です。対戦／KO時に **59.82 FPS** を観測。実機確認とは区別しています。
+GitHub Actions の `83a2c80` を既存のDuckStationで読み直して実行。表示は **59.82 FPS** ですが、継続計測では4,200描画フレーム中9回の2VBlank間隔を検出しました。診断ログの負荷も含めて調査中で、60fps維持の受け入れは未完了です。[計測ログ](docs/frame-audit.txt)。実機確認とは区別しています。
 
 [スクリーンショット付き実装履歴](docs/IMPLEMENTATION.md)
 

@@ -1,0 +1,10 @@
+Build: 83a2c80
+Environment: DuckStation, native NTSC, CPU overclock disabled
+Scope: seven consecutive 600-frame windows, title and CPU demo; diagnostic TTY enabled
+I/TTY: FACET perf frames=600 vblanks=602 slow=2 max=2
+I/TTY: FACET perf frames=600 vblanks=601 slow=1 max=2
+I/TTY: FACET perf frames=600 vblanks=602 slow=2 max=2
+I/TTY: FACET perf frames=600 vblanks=601 slow=1 max=2
+I/TTY: FACET perf frames=600 vblanks=601 slow=1 max=2
+I/TTY: FACET perf frames=600 vblanks=601 slow=1 max=2
+I/TTY: FACET perf frames=600 vblanks=601 slow=1 max=2
