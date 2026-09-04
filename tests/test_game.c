@@ -30,6 +30,12 @@ int main(void){
  start(150);g.f[0].x=RING_EDGE+1;game_tick(&g,0,0);assert(g.reason==RING_OUT&&g.winner==1);
  start(150);g.remaining=1;g.f[0].hp=90;game_tick(&g,0,0);assert(g.reason==TIME_UP&&g.winner==1);
  start(150);g.remaining=1;game_tick(&g,0,0);assert(g.reason==DRAW&&g.winner==-1);
+ /* With fighters aligned in depth, both screen-relative inputs approach. */
+ start(400);g.f[0].x=g.f[1].x=0;g.f[0].z=-200;g.f[1].z=200;
+ ticks(10,IN_RIGHT,IN_LEFT);assert(game_distance(&g.f[0],&g.f[1])<320);
+ start(400);g.f[0].x=g.f[1].x=0;g.f[0].z=-200;g.f[1].z=200;
+ {int i;for(i=0;i<60;i++){int a=game_cpu(&g,0,1),b=game_cpu(&g,1,1);game_tick(&g,a,b);}}
+ assert(game_distance(&g.f[0],&g.f[1])<300);
  /* Identical seeds and commands must remain bit-identical for long runs. */
  {Game a,b;int i;game_init(&a,0,1,37);game_init(&b,0,1,37);
   for(i=0;i<20000;i++){

@@ -37,7 +37,7 @@ void game_init(Game*g,int c1,int c2,uint32_t seed){
  g->rng=seed?seed:1;g->round=1;reset_round(g);
 }
 static void begin(Fighter*f,int action){f->action=action;f->tick=0;f->landed=0;f->guard=0;}
-static void advance(Fighter*f,Fighter*other,uint16_t in){
+static void advance(Fighter*f,Fighter*other,uint16_t in,int player){
  unsigned pressed=in&~f->previous;f->previous=in;f->walk=0;
  f->x+=f->vx;f->z+=f->vz;f->vx=f->vx*3/4;f->vz=f->vz*3/4;
  if(f->stun){
@@ -66,9 +66,10 @@ static void advance(Fighter*f,Fighter*other,uint16_t in){
   int speed=f->crouch?2:(f->character?4:5);
   int x=!!(in&IN_RIGHT)-!!(in&IN_LEFT);
   int side=!!(in&IN_STEP_R)-!!(in&IN_STEP_L);
-  /* Left/right are screen/world X; shoulders circle the opponent. */
-  f->x+=x*speed-side*f->dz*speed/1024;
-  f->z+=side*f->dx*speed/1024;
+  /* Camera tracks P1 -> P2. Both pads share that screen-right axis. */
+  int direction=player?-1:1;
+  f->x+=(x*direction*f->dx-side*f->dz)*speed/1024;
+  f->z+=(x*direction*f->dz+side*f->dx)*speed/1024;
   f->walk=!!(x||side);
  }
 }
@@ -119,7 +120,7 @@ void game_tick(Game*g,uint16_t p1,uint16_t p2){
    else{g->round++;reset_round(g);}
   }return;
  }
- advance(&g->f[0],&g->f[1],p1);advance(&g->f[1],&g->f[0],p2);
+ advance(&g->f[0],&g->f[1],p1,0);advance(&g->f[1],&g->f[0],p2,1);
  for(i=0;i<2;i++)if(g->f[i].action>=PUNCH&&g->f[i].action<=SHOULDER&&!g->f[i].tick)g->events|=EV_SWING;
  /* Evaluate both contacts before applying either: same-frame strikes trade. */
  a=contact(&g->f[0],&g->f[1]);b=contact(&g->f[1],&g->f[0]);
@@ -147,12 +148,14 @@ uint16_t game_cpu(Game*g,int player,int difficulty){
  g->rng^=g->rng<<13;g->rng^=g->rng>>17;g->rng^=g->rng<<5;r=g->rng;
  if(g->phase!=FIGHT)return 0;
  if(absolute(a->x)>640||absolute(a->z)>640){
-  int side=(-a->z*a->dx+a->x*a->dz)>0;
-  return (a->x>0?IN_LEFT:IN_RIGHT)|(side?IN_STEP_R:IN_STEP_L);
+  int forward=-a->x*a->dx-a->z*a->dz;
+  int lateral=a->x*a->dz-a->z*a->dx;
+  int right=player?forward<0:forward>0;
+  return (right?IN_RIGHT:IN_LEFT)|(lateral>0?IN_STEP_R:IN_STEP_L);
  }
  if(b->action>=PUNCH&&b->action<=SHOULDER && (int)(r%100)<35+difficulty*15)
   return IN_GUARD|(b->action==LOW_KICK?IN_DOWN:0);
- if(d>220)return b->x>a->x?IN_RIGHT:IN_LEFT;
+ if(d>220)return player?IN_LEFT:IN_RIGHT;
  if(r%19==0)return IN_SHOULDER;
  if(r%13==0)return IN_GUARD|IN_PUNCH;
  if(r%11==0)return IN_DOWN|IN_KICK;
