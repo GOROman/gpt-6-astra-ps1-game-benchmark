@@ -16,6 +16,14 @@ enum ScreenMode { TITLE, SELECT, PLAY, RESULT, HELP };
 static uint8_t pads[2][34];
 static uint16_t read_pad(int n){
  const PADTYPE*p=(const PADTYPE*)pads[n];
+ static unsigned last[2]={0xffffffffu,0xffffffffu};
+ unsigned state=(unsigned)pads[n][0]|((unsigned)pads[n][1]<<8)|((unsigned)p->btn<<16);
+ /* BIOS writes these buffers asynchronously. Log changes only, so a missing
+    device, a rejected packet and a missed host key can be distinguished. */
+ if(state!=last[n]){
+  printf("FACET pad%d status=%02x id=%02x buttons=%04x\n",n+1,pads[n][0],pads[n][1],(unsigned)(uint16_t)~p->btn);
+  last[n]=state;
+ }
  if(p->stat||p->len<1)return 0;
  if(p->type!=PAD_ID_DIGITAL&&p->type!=PAD_ID_ANALOG&&p->type!=PAD_ID_ANALOG_STICK)return 0;
  return (uint16_t)~p->btn;
@@ -132,8 +140,8 @@ int main(void){
   }else if(screen==HELP){
    render_center(26,"HOW TO PLAY");
    render_text(24,52,"LEFT/RIGHT   MOVE\nDOWN         CROUCH\nUP           JUMP\nSQUARE       PUNCH (HIGH)\nTRIANGLE     KICK (MID)\nCROSS        GUARD\nCIRCLE       THROW (P+G)\nDOWN+KICK    LOW KICK\nPUNCH+KICK   HEAVY KICK\nL1 / R1      CIRCLE RIVAL\nR2           SHOULDER RAM\nL2           BACKSTEP\nSTART        PAUSE");
-   render_center(154,"KO / RING OUT / 30 SECOND LIMIT");
-   render_center(170,"FIRST TO TWO ROUNDS WINS");render_center(186,"GUARD LOW: DOWN+CROSS");
+   render_center(166,"KO / RING OUT / 30 SECOND LIMIT");
+   render_center(180,"FIRST TO TWO ROUNDS WINS");render_center(194,"GUARD LOW: DOWN+CROSS");
    render_center(218,"START TO RETURN");render_rect(12,18,296,212,12,20,33);
   }else{
    hud(&game,versus,stage);
