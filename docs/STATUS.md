@@ -3,7 +3,7 @@
 - [x] Public repository, original game specification, incremental history.
 - [x] Deterministic combat: attacks, guarding, crouch/jump, throws, hit reactions.
 - [x] Rules tested: KO, ring-out, timeout, draw, first-to-two and rematch.
-- [ ] Native PS1 build: EXE and bootable BIN/CUE.
+- [x] Native PS1 build: EXE and bootable BIN/CUE.
 - [ ] Flat-shaded articulated 3D fighters and raised arena rendered in emulator.
 - [ ] Title, selection, CPU play, two-player versus, pause and result screen.
 - [ ] Audible attack / hit / round cues.
@@ -20,3 +20,5 @@ SSH to `mac-studio` timed out; `mac-studio.local` did not resolve. Continue inde
 Portable combat tests pass under AddressSanitizer and UndefinedBehaviorSanitizer, including 20,000 deterministic CPU simulation frames. This does not yet verify PS1 runtime behavior.
 
 Build direction updated by user: GitHub Actions builds; tag and GitHub Release only after completion.
+
+GitHub Actions run [33926563885](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33926563885) compiled the native EXE and BIN/CUE and uploaded the `facet-ps1` artifact.

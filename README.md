@@ -1,5 +1,9 @@
 # FACET FIGHTER — PlayStation 1
 
+[![Development progress: 40% (4/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
+
+**進捗: 40% — 10項目中4項目を検証済み。** PS1 ビルド成功。次はエミュレーター動作確認とサウンド。完成後にタグ・Release を公開します。
+
 An original flat-shaded 3D fighting game for the original PlayStation, inspired by early polygonal arcade fighters. All fighters, geometry and presentation are original.
 
 ## Planned game
