@@ -1,0 +1,18 @@
+# Acceptance and current state
+
+- [x] Public repository, original game specification, incremental history.
+- [ ] Deterministic combat: attacks, guarding, crouch/jump, throws, hit reactions.
+- [ ] Rules tested: KO, ring-out, timeout, draw, first-to-two and rematch.
+- [ ] Native PS1 build: EXE and bootable BIN/CUE.
+- [ ] Flat-shaded articulated 3D fighters and raised arena rendered in emulator.
+- [ ] Title, selection, CPU play, two-player versus, pause and result screen.
+- [ ] Audible attack / hit / round cues.
+- [ ] Emulator playthrough and two-controller input verified.
+- [ ] Build instructions, controls, release artifacts and evidence published.
+
+Physical-console testing must be reported separately from emulator testing.
+
+## Environment observations
+
+2026-09-05: Empty local repository at task start. Origin existed as private.
+SSH to `mac-studio` timed out; `mac-studio.local` did not resolve. Continue independent implementation and recheck the build host before integration.
