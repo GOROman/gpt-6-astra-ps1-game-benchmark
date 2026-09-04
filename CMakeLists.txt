@@ -4,3 +4,9 @@ psn00bsdk_add_executable(facet GPREL src/main.c src/game.c src/render.c src/soun
 target_include_directories(facet PRIVATE src)
 target_compile_options(facet PRIVATE -Wall -Wextra)
 psn00bsdk_add_cd_image(iso facet iso.xml DEPENDS facet system.cnf)
+
+execute_process(COMMAND git rev-parse --short HEAD WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} OUTPUT_VARIABLE FACET_REVISION OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT FACET_REVISION)
+  set(FACET_REVISION source)
+endif()
+target_compile_definitions(facet PRIVATE FACET_REVISION="${FACET_REVISION}")

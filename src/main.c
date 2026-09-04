@@ -8,6 +8,10 @@
 #include <psxpad.h>
 #include <psxetc.h>
 
+#ifndef FACET_REVISION
+#define FACET_REVISION "source"
+#endif
+
 enum ScreenMode { TITLE, SELECT, PLAY, RESULT, HELP };
 static uint8_t pads[2][34];
 static uint16_t read_pad(int n){
@@ -118,7 +122,8 @@ int main(void){
    render_center(169,choice==0?"> ARCADE <":"  ARCADE  ");
    render_center(182,choice==1?"> 2P VERSUS <":"  2P VERSUS  ");
    render_center(195,choice==2?"> HOW TO PLAY <":"  HOW TO PLAY  ");
-   render_center(222,"UP/DOWN  -  START TO SELECT");
+   render_center(218,"UP/DOWN  -  START TO SELECT");
+   render_center(230,"BUILD " FACET_REVISION);
   }else if(screen==SELECT){
    render_center(24,"CHOOSE YOUR FIGHTER");
    render_text(24,62,game_character_name(chars[0]));render_text(206,62,game_character_name(versus?chars[1]:chars[0]^1));
