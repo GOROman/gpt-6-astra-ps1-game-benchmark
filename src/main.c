@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <psxapi.h>
 #include <psxpad.h>
+#include <psxetc.h>
 
 enum ScreenMode { TITLE, SELECT, PLAY, RESULT, HELP };
 static uint8_t pads[2][34];
@@ -42,7 +43,7 @@ static void hud(const Game*g,int versus,int stage){
  sprintf(text,"ROUND %d   %s",g->round,versus?"2P VERSUS":"ARCADE");render_center(218,text);
  if(!versus){sprintf(text,"STAGE %d/3",stage);render_center(204,text);}
  render_rect(8,5,304,44,12,20,33);
- if(g->phase==INTRO){sprintf(text,g->tick<60?"ROUND %d":"FIGHT!",g->round);render_center(88,text);}
+ if(g->phase==INTRO){sprintf(text,g->tick<40?"ROUND %d":"FIGHT!",g->round);render_center(88,text);}
  if(g->phase==ROUND_OVER){
   static const char*reason[]={"","K.O.","RING OUT","TIME UP","DRAW"};
   render_center(84,reason[g->reason]);
@@ -51,18 +52,25 @@ static void hud(const Game*g,int versus,int stage){
 }
 int main(void){
  Game game;int screen=TITLE,choice=0,versus=0,frame=0,idle=0,paused=0,stage=1,demo=0;
+ int last_vblank=0;
  int chars[2]={0,1};uint16_t previous[2]={0,0};
  render_init();sound_init();InitPAD(pads[0],34,pads[1],34);StartPAD();ChangeClearPAD(0);
+ last_vblank=VSync(-1);
  game_init(&game,0,1,1);printf("FACET boot: native PS1\n");
  for(;;){
   uint16_t p[2]={read_pad(0),read_pad(1)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
-  int i,oldphase=game.phase;previous[0]=p[0];previous[1]=p[1];frame=(frame+1)&32767;
+  int now=VSync(-1),steps=now-last_vblank;
+  int i,oldphase=game.phase;last_vblank=now;
+  if(steps<1)steps=1;
+  if(steps>4)steps=4;
+  previous[0]=p[0];previous[1]=p[1];frame=(frame+steps)&32767;
   if(screen==TITLE){
    if(edge[0]&PAD_DOWN)choice=(choice+1)%3;
    if(edge[0]&PAD_UP)choice=(choice+2)%3;
    if(edge[0]&(PAD_START|PAD_CROSS)){screen=choice==2?HELP:SELECT;versus=choice==1;idle=0;}
    if(p[0]||p[1])idle=0;
-   if(++idle>600){demo=1;screen=PLAY;game_init(&game,0,1,(unsigned)frame+1);}
+   idle+=steps;
+   if(idle>600){demo=1;screen=PLAY;game_init(&game,0,1,(unsigned)frame+1);}
   }else if(screen==HELP){if(edge[0]&(PAD_START|PAD_CROSS|PAD_SELECT))screen=TITLE;}
   else if(screen==SELECT){
    for(i=0;i<(versus?2:1);i++)if(edge[i]&(PAD_LEFT|PAD_RIGHT))chars[i]^=1;
@@ -76,8 +84,10 @@ int main(void){
     if(!demo&&((edge[0]|edge[1])&PAD_START))paused=!paused;
     if(paused){if(edge[0]&PAD_SELECT){paused=0;screen=TITLE;idle=0;}}
     else{
+     for(i=0;i<steps;i++){
      game_tick(&game,demo?game_cpu(&game,0,1):commands(p[0]),versus&&!demo?commands(p[1]):game_cpu(&game,1,stage));
      sound_event(game.events);
+     }
      if(oldphase!=game.phase)printf("FACET phase=%d round=%d hp=%d,%d winner=%d reason=%d\n",game.phase,game.round,game.f[0].hp,game.f[1].hp,game.winner,game.reason);
      if(game.phase==MATCH_OVER){
       if(demo){screen=TITLE;idle=0;demo=0;}

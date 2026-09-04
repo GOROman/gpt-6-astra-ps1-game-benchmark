@@ -4,6 +4,8 @@
 #define FPS 60
 #define RING_EDGE 760
 #define MAX_HP 100
+#define INTRO_TICKS 60
+#define RESULT_TICKS 90
 #define ROUND_TICKS (30 * FPS)
 
 enum Input { IN_LEFT=1, IN_RIGHT=2, IN_UP=4, IN_DOWN=8,

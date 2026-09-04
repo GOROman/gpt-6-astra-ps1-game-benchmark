@@ -24,8 +24,8 @@ int main(void){
  start(150);g.f[0].x=570;g.f[1].x=720;strike(IN_SHOULDER,0);assert(g.reason==RING_OUT&&g.winner==0);
  start(400);strike(IN_PUNCH,0);assert(g.f[1].hp==100);
  start(150);g.f[1].hp=1;strike(IN_PUNCH,0);assert(g.reason==KO&&g.winner==0&&g.f[0].wins==1);
- ticks(150,0,0);assert(g.phase==INTRO&&g.round==2);ticks(90,0,0);assert(g.phase==FIGHT);
- g.f[1].hp=0;game_tick(&g,0,0);ticks(150,0,0);assert(g.phase==MATCH_OVER&&g.f[0].wins==2);
+ ticks(RESULT_TICKS,0,0);assert(g.phase==INTRO&&g.round==2);ticks(INTRO_TICKS,0,0);assert(g.phase==FIGHT);
+ g.f[1].hp=0;game_tick(&g,0,0);ticks(RESULT_TICKS,0,0);assert(g.phase==MATCH_OVER&&g.f[0].wins==2);
  start(150);g.f[0].hp=g.f[1].hp=1;game_tick(&g,IN_PUNCH,IN_PUNCH);ticks(10,0,0);assert(g.reason==DRAW&&g.winner==-1&&!g.f[0].wins);
  start(150);g.f[0].x=RING_EDGE+1;game_tick(&g,0,0);assert(g.reason==RING_OUT&&g.winner==1);
  start(150);g.remaining=1;g.f[0].hp=90;game_tick(&g,0,0);assert(g.reason==TIME_UP&&g.winner==1);

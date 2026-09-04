@@ -189,7 +189,7 @@ void render_begin(const Game*g,int frame,int presentation){
  next=(uint8_t*)buffers[active].packet;ClearOTagR(buffers[active].ot,OT_SIZE);
  if(presentation==0){angle=isin(frame*2)*400/4096;zoom=1900;tilt=280;}
  else if(presentation==1){angle=isin(frame)*180/4096;zoom=1700;tilt=190;}
- else if(g->phase==INTRO){angle+=(90-g->tick)*4;zoom+= (90-g->tick)*5;tilt=220+(90-g->tick);}
+ else if(g->phase==INTRO){angle+=(INTRO_TICKS-g->tick)*4;zoom+= (INTRO_TICKS-g->tick)*5;tilt=220+(INTRO_TICKS-g->tick);}
  else if((g->phase==ROUND_OVER||g->phase==MATCH_OVER)&&g->winner>=0){
   const Fighter*w=&g->f[g->winner];
   tx=(tx+w->x*3)/4;tz=(tz+w->z*3)/4;zoom=1400;angle+=280;tilt=160;

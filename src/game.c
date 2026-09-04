@@ -3,12 +3,12 @@
 
 const Move game_moves[7]={
  {0,0,0,0,0,0,0,HIGH},
- {7,3,12,9,185,18,15,HIGH},
- {15,4,22,18,265,45,25,MID},
- {13,4,23,12,240,30,20,LOW},
- {23,4,30,26,240,100,48,MID},
- {10,1,30,22,145,125,48,GRAB},
- {11,4,31,24,175,160,48,MID}
+ {5,3,8,9,185,18,12,HIGH},
+ {11,3,16,18,265,45,20,MID},
+ {10,3,17,12,240,30,17,LOW},
+ {18,4,24,26,240,100,40,MID},
+ {8,1,24,22,145,125,40,GRAB},
+ {10,4,25,24,175,160,40,MID}
 };
 static int absolute(int n){return n<0?-n:n;}
 static int root(unsigned n){
@@ -111,10 +111,10 @@ void game_tick(Game*g,uint16_t p1,uint16_t p2){
  if(g->phase==MATCH_OVER)return;
  if(g->phase==INTRO){
   g->f[0].previous=p1;g->f[1].previous=p2;
-  if(g->tick>=90){g->phase=FIGHT;g->tick=0;}return;
+  if(g->tick>=INTRO_TICKS){g->phase=FIGHT;g->tick=0;}return;
  }
  if(g->phase==ROUND_OVER){
-  if(g->tick>=150){
+  if(g->tick>=RESULT_TICKS){
    if(g->f[0].wins>=2||g->f[1].wins>=2){g->phase=MATCH_OVER;g->tick=0;}
    else{g->round++;reset_round(g);}
   }return;
