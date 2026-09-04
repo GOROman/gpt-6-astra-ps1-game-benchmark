@@ -29,7 +29,8 @@ static void quad(V a,V b,V c,V d,Color col){
  Screen p[4]={project(a),project(b),project(c),project(d)};
  int z=(p[0].z+p[1].z+p[2].z+p[3].z)/16;
  POLY_F4*q;
- if(z<2)z=2;if(z>=OT_SIZE)z=OT_SIZE-1;
+ if(z<2)z=2;
+ if(z>=OT_SIZE)z=OT_SIZE-1;
  q=alloc(sizeof(*q));if(!q)return;
  setPolyF4(q);setRGB0(q,col.r,col.g,col.b);
  setXY4(q,p[0].x,p[0].y,p[1].x,p[1].y,p[2].x,p[2].y,p[3].x,p[3].y);
@@ -48,20 +49,45 @@ static V world(const Fighter*f,V p){
  if(f->action==DOWN){int t=p.x;p.x=p.y-120;p.y=35-t/4;}
  return v(f->x+(p.x*f->dx-p.z*f->dz)/1024,f->y+p.y,f->z+(p.x*f->dz+p.z*f->dx)/1024);
 }
-static void limb(const Fighter*f,V a,V b,int width,int depth,Color col){
- V p[8];int i,dy=b.y-a.y,dx=b.x-a.x;
- int len=(dx<0?-dx:dx)+(dy<0?-dy:dy);int ox,oy;
- if(!len)len=1;ox=dy*width/len;oy=-dx*width/len;
- for(i=0;i<8;i++){
-  V end=i&4?b:a;int s=i&1?1:-1,t=i&2?1:-1;
-  p[i]=world(f,v(end.x+s*ox,end.y+s*oy,end.z+t*depth));
+static void triangle(V a,V b,V c,Color col){
+ Screen p[3]={project(a),project(b),project(c)};
+ int z=(p[0].z+p[1].z+p[2].z)/12;
+ POLY_F3*q;
+ if(z<2)z=2;
+ if(z>=OT_SIZE)z=OT_SIZE-1;
+ q=alloc(sizeof(*q));if(!q)return;
+ setPolyF3(q);setRGB0(q,col.r,col.g,col.b);
+ setXY3(q,p[0].x,p[0].y,p[1].x,p[1].y,p[2].x,p[2].y);
+ addPrim(&buffers[active].ot[z],q);
+}
+/* Eight-sided tapered solid: 16 vertices, 8 quads + 12 cap triangles.
+   Each face receives its own constant light intensity (flat shading). */
+static void tapered(const Fighter*f,V a,V b,int wa,int da,int wb,int db,Color col){
+ static const int ring[8][2]={{1024,0},{724,724},{0,1024},{-724,724},
+  {-1024,0},{-724,-724},{0,-1024},{724,-724}};
+ static const int light[8]={108,100,82,65,55,65,82,100};
+ V p[16];int i,end,dy=b.y-a.y,dx=b.x-a.x;
+ int len=(dx<0?-dx:dx)+(dy<0?-dy:dy);
+ if(!len)len=1;
+ for(end=0;end<2;end++){
+  V point=end?b:a;int width=end?wb:wa,depth=end?db:da;
+  for(i=0;i<8;i++){
+   int offset=ring[i][0]*width/1024;
+   p[end*8+i]=world(f,v(point.x+dy*offset/len,point.y-dx*offset/len,
+    point.z+ring[i][1]*depth/1024));
+  }
  }
- quad(p[0],p[1],p[2],p[3],color(col.r*6/10,col.g*6/10,col.b*6/10));
- quad(p[4],p[6],p[5],p[7],col);
- quad(p[0],p[4],p[1],p[5],color(col.r*7/10,col.g*7/10,col.b*7/10));
- quad(p[2],p[3],p[6],p[7],color(col.r*9/10,col.g*9/10,col.b*9/10));
- quad(p[0],p[2],p[4],p[6],color(col.r*8/10,col.g*8/10,col.b*8/10));
- quad(p[1],p[5],p[3],p[7],color(col.r*11/10,col.g*11/10,col.b*11/10));
+ for(i=0;i<8;i++){
+  int j=(i+1)%8,l=light[i];
+  quad(p[i],p[j],p[i+8],p[j+8],color(col.r*l/100,col.g*l/100,col.b*l/100));
+ }
+ for(i=1;i<7;i++){
+  triangle(p[0],p[i+1],p[i],color(col.r*6/10,col.g*6/10,col.b*6/10));
+  triangle(p[8],p[8+i],p[9+i],col);
+ }
+}
+static void limb(const Fighter*f,V a,V b,int width,int depth,Color col){
+ tapered(f,a,b,width,depth,width*4/5,depth*4/5,col);
 }
 static void fighter(const Fighter*f,int frame){
  int crouch=f->crouch?85:0,phase=frame%32,wave=(phase<16?phase:32-phase)-8;
@@ -91,13 +117,18 @@ static void fighter(const Fighter*f,int frame){
  knee[0].x+=kick*110/1024;knee[0].y+=kick*(low?0:110)/1024;
  foot[0].x+=kick*265/1024;foot[0].y+=kick*(low?40:270)/1024;
  if(f->action==JUMP){knee[0].y+=55;knee[1].y+=55;foot[0].y+=65;foot[1].y+=65;}
- limb(f,hip,neck,f->character?44:35,59,top);
+ /* Hip -> waist -> rib cage -> shoulders: an actual torso silhouette. */
+ tapered(f,hip,v(2,245-crouch,0),34,49,28,40,top);
+ tapered(f,v(2,245-crouch,0),v(6,302-crouch+bob,0),28,40,
+  f->character?47:38,f->character?70:61,top);
+ tapered(f,v(6,302-crouch+bob,0),neck,f->character?47:38,
+  f->character?70:61,26,40,top);
  limb(f,v(0,190-crouch,0),v(0,216-crouch,0),39,62,dark);
  for(i=0;i<2;i++){
-  limb(f,v(hip.x,hip.y,i?38:-38),knee[i],29,28,cloth);
-  limb(f,knee[i],foot[i],22,23,cloth);
+  tapered(f,v(hip.x,hip.y,i?38:-38),knee[i],33,30,23,23,cloth);
+  tapered(f,knee[i],foot[i],25,24,16,18,cloth);
   limb(f,v(foot[i].x-10,foot[i].y,foot[i].z),v(foot[i].x+38,foot[i].y+2,foot[i].z),14,25,dark);
-  limb(f,shoulder[i],elbow[i],21,23,skin);limb(f,elbow[i],hand[i],17,19,skin);
+  tapered(f,shoulder[i],elbow[i],25,25,17,18,skin);tapered(f,elbow[i],hand[i],19,20,12,13,skin);
   limb(f,hand[i],v(hand[i].x+21,hand[i].y,hand[i].z),20,21,cloth);
  }
  limb(f,v(neck.x,neck.y,0),v(neck.x,neck.y+20,0),17,21,skin);
