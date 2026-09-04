@@ -128,7 +128,19 @@ static void fighter(const Fighter*f,int frame){
   foot[0].x+=extend*60/1024;foot[1].x-=extend*45/1024;
   extend=0;
  }
- hand[0].x+=extend*150/1024;hand[0].y+=extend*10/1024;elbow[0].x+=extend*90/1024;
+ /* Fixed bone lengths. The fist follows elbow rotation, never stretches. */
+ for(i=0;i<2;i++){
+  int upper=-700,lower=480;
+  if(f->guard){upper=-500;lower=900;}
+  else if(f->action==SHOULDER){upper=-900;lower=900;}
+  else if((i==0||f->action==THROW)&&extend){
+   upper+=extend*700/1024;lower-=extend*480/1024;
+  }
+  elbow[i]=v(shoulder[i].x+icos(upper)*70/4096,
+   shoulder[i].y+isin(upper)*70/4096,shoulder[i].z);
+  hand[i]=v(elbow[i].x+icos(lower)*65/4096,
+   elbow[i].y+isin(lower)*65/4096,elbow[i].z);
+ }
  knee[0].x+=kick*110/1024;knee[0].y+=kick*(low?0:110)/1024;
  foot[0].x+=kick*265/1024;foot[0].y+=kick*(low?40:270)/1024;
  if(f->action==JUMP){knee[0].y+=55;knee[1].y+=55;foot[0].y+=65;foot[1].y+=65;}
