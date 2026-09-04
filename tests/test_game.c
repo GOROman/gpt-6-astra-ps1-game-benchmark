@@ -37,6 +37,12 @@ int main(void){
  start(400);game_tick(&g,0,IN_RIGHT);game_tick(&g,0,0);game_tick(&g,0,IN_RIGHT);
  assert(g.f[1].action==BACKSTEP);
  start(400);ticks(10,IN_DOWN,0);assert(g.f[0].crouch);game_tick(&g,0,0);assert(!g.f[0].crouch);
+ start(150);game_tick(&g,IN_PUNCH,0);ticks(5,0,0);
+ assert(g.hitstop==3&&g.f[1].hp==91&&g.effect_life[1]==14);
+ {int time=g.remaining,x=g.f[1].x,t=g.f[0].tick;int freeze=g.hitstop;
+  ticks(freeze,0,0);assert(g.remaining==time&&g.f[1].x==x&&g.f[0].tick==t);
+  game_tick(&g,0,0);assert(g.remaining==time-1&&g.f[1].hp==91);
+ }
  /* With fighters aligned in depth, both screen-relative inputs approach. */
  start(400);g.f[0].x=g.f[1].x=0;g.f[0].z=-200;g.f[1].z=200;
  ticks(10,IN_RIGHT,IN_LEFT);assert(game_distance(&g.f[0],&g.f[1])<320);

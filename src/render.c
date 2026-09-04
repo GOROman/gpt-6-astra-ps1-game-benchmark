@@ -11,7 +11,7 @@ typedef struct {DRAWENV draw;DISPENV disp;uint32_t ot[OT_SIZE];uint32_t packet[P
 static Buffer buffers[2];static int active;static uint8_t*next;
 static int center_x,center_z,camera=2100;
 static int yaw,pitch=250,yaw_sin,yaw_cos=4096,pitch_sin,pitch_cos;
-static int shake,old_hp=200;
+static int shake,shake_strength=2,old_hp=200;
 typedef struct {int x,y,z;} V;
 typedef struct {int x,y,z;} Screen;
 typedef struct {int r,g,b;} Color;
@@ -26,7 +26,7 @@ static Screen project(V p){
  z=(-x*yaw_sin+z*yaw_cos)/4096;
  s.z=camera+(z*pitch_cos-p.y*pitch_sin)/4096;
  if(s.z<160)s.z=160;
- s.x=160+rx*420/s.z+(shake?((shake&1)?2:-2):0);
+ s.x=160+rx*420/s.z+(shake?((shake&1)?1:-1)*shake*shake_strength/8:0);
  s.y=184+((-z*pitch_sin-p.y*pitch_cos)/4096)*420/s.z;
  return s;
 }
@@ -217,7 +217,7 @@ void render_begin(const Game*g,int frame,int presentation){
  camera+=(zoom-camera)/12;pitch+=(tilt-pitch)/12;
  yaw_sin=isin(yaw);yaw_cos=icos(yaw);pitch_sin=isin(pitch);pitch_cos=icos(pitch);
  hp=g->f[0].hp+g->f[1].hp;
- if(presentation==2&&hp<old_hp)shake=6;else if(shake)shake--;
+ if(presentation==2&&hp<old_hp){shake=8;shake_strength=old_hp-hp>=18?5:2;}else if(shake)shake--;
  old_hp=hp;
 }
 void render_scene(const Game*g,int frame){int x,z,i;
@@ -240,6 +240,26 @@ void render_scene(const Game*g,int frame){int x,z,i;
   fighter(f,frame);
  }
 }
+static void hit_effect(const Game*g,int player){
+ int life=g->effect_life[player],i,age=14-life;
+ Screen p;
+ if(life<=0)return;
+ p=project(v(g->effect_x[player],g->effect_y[player],g->effect_z[player]));
+ for(i=0;i<8;i++){
+  int angle=i*512+age*45,radius=4+age*2;
+  int x=p.x+icos(angle)*radius/4096,y=p.y+isin(angle)*radius/4096;
+  LINE_F2*line=alloc(sizeof(*line));
+  if(!line)return;
+  setLineF2(line);setXY2(line,x,y,x+icos(angle)*life/4096,y+isin(angle)*life/4096);
+  setRGB0(line,g->effect_block[player]?100:245,g->effect_block[player]?210:170,life*16);
+  addPrim(&buffers[active].ot[1],line);
+ }
+ if(life>10){
+  TILE*t=alloc(sizeof(*t));if(!t)return;setTile(t);setXY0(t,p.x-2,p.y-2);
+  setWH(t,5,5);setRGB0(t,255,248,220);addPrim(&buffers[active].ot[1],t);
+ }
+}
+void render_effects(const Game*g){hit_effect(g,0);hit_effect(g,1);}
 void render_end(void){
  DrawSync(0);VSync(0);PutDispEnv(&buffers[active^1].disp);
  DrawOTagEnv(&buffers[active].ot[OT_SIZE-1],&buffers[active].draw);active^=1;

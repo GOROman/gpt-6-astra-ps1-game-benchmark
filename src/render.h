@@ -7,5 +7,6 @@ void render_scene(const Game*g,int frame);
 void render_text(int x,int y,const char*text);
 void render_center(int y,const char*text);
 void render_rect(int x,int y,int w,int h,int r,int g,int b);
+void render_effects(const Game*g);
 void render_end(void);
 #endif

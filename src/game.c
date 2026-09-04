@@ -30,6 +30,7 @@ static void reset_round(Game*g){
   memset(f,0,sizeof(*f)); f->character=c;f->wins=w;f->hp=MAX_HP;
   f->x=i?240:-240; f->dx=i?-1024:1024;
  }
+ g->hitstop=0;g->effect_life[0]=g->effect_life[1]=0;g->freeze_input[0]=g->freeze_input[1]=0;
  g->phase=INTRO;g->tick=0;g->remaining=ROUND_TICKS;g->reason=NONE;g->winner=-1;
 }
 void game_init(Game*g,int c1,int c2,uint32_t seed){
@@ -84,7 +85,7 @@ static void advance(Fighter*f,Fighter*other,uint16_t in,int player){
   f->walk=!!(x||side);
  }
 }
-typedef struct {int hit,damage,push,stun,blocked,knock,dx,dz;} Contact;
+typedef struct {int hit,damage,push,stun,blocked,knock,dx,dz,level;} Contact;
 static Contact contact(Fighter*a,Fighter*b){
  Contact c={0};const Move*m;int d,dot;
  if(a->action<PUNCH||a->action>SHOULDER||a->landed)return c;
@@ -97,7 +98,7 @@ static Contact contact(Fighter*a,Fighter*b){
  if(m->level==HIGH&&(b->crouch||b->y>65))return c;
  if(m->level==LOW&&b->y>25)return c;
  if(m->level==GRAB&&(b->y>0||b->crouch||b->stun||b->action!=IDLE))return c;
- c.hit=1;c.dx=a->dx;c.dz=a->dz;
+ c.hit=1;c.level=m->level;c.dx=a->dx;c.dz=a->dz;
  c.blocked=b->guard && ((m->level==LOW&&b->crouch)||((m->level==HIGH||m->level==MID)&&!b->crouch));
  c.damage=c.blocked?0:m->damage+(a->character?2:0);
  c.push=c.blocked?m->push/3:m->push;
@@ -107,6 +108,12 @@ static Contact contact(Fighter*a,Fighter*b){
 }
 static void apply(Game*g,Fighter*b,Contact c){
  if(!c.hit)return;
+ {int index=(int)(b-g->f),stop=c.blocked?2:c.damage>=18?6:3;
+  if(stop>g->hitstop)g->hitstop=stop;
+  g->effect_life[index]=14;g->effect_x[index]=b->x-c.dx*30/1024;
+  g->effect_z[index]=b->z-c.dz*30/1024;g->effect_y[index]=c.level==LOW?75:285;
+  g->effect_block[index]=c.blocked;
+ }
  b->hp-=c.damage;if(b->hp<0)b->hp=0;
  b->vx=c.dx*c.push/4096;b->vz=c.dz*c.push/4096;
  b->stun=c.stun;b->tick=0;b->action=c.knock?DOWN:HURT;
@@ -119,7 +126,13 @@ static void finish(Game*g,int winner,int reason){
  g->events|=EV_ROUND;
 }
 void game_tick(Game*g,uint16_t p1,uint16_t p2){
- Contact a,b;int out0,out1,i;g->events=0;g->tick++;
+ Contact a,b;int out0,out1,i;g->events=0;
+ for(i=0;i<2;i++)if(g->effect_life[i])g->effect_life[i]--;
+ if(g->hitstop){
+  g->hitstop--;g->freeze_input[0]|=p1;g->freeze_input[1]|=p2;return;
+ }
+ p1|=g->freeze_input[0];p2|=g->freeze_input[1];
+ g->freeze_input[0]=g->freeze_input[1]=0;g->tick++;
  if(g->phase==MATCH_OVER)return;
  if(g->phase==INTRO){
   g->f[0].previous=p1;g->f[1].previous=p2;
