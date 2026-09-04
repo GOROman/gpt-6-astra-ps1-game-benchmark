@@ -27,7 +27,7 @@ static Screen project(V p){
  s.z=camera+(z*pitch_cos-p.y*pitch_sin)/4096;
  if(s.z<160)s.z=160;
  s.x=160+rx*420/s.z+(shake?((shake&1)?2:-2):0);
- s.y=184+(-z*pitch_sin-p.y*pitch_cos)*420/4096/s.z;
+ s.y=184+((-z*pitch_sin-p.y*pitch_cos)/4096)*420/s.z;
  return s;
 }
 static void screen_quad(Screen a,Screen b,Screen c,Screen d,Color col){
@@ -58,6 +58,7 @@ static V world(const Fighter*f,V p){
  return v(f->x+(p.x*f->dx-p.z*f->dz)/1024,f->y+p.y,f->z+(p.x*f->dz+p.z*f->dx)/1024);
 }
 static void screen_triangle(Screen a,Screen b,Screen c,Color col){
+ if((b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x)>=0)return;
  Screen p[3]={a,b,c};
  int z=(p[0].z+p[1].z+p[2].z)/12;
  POLY_F3*q;
@@ -87,6 +88,7 @@ static void tapered(const Fighter*f,V a,V b,int wa,int da,int wb,int db,Color co
  }
  for(i=0;i<8;i++){
   int j=(i+1)%8,l=light[i];
+  if((p[j].x-p[i].x)*(p[i+8].y-p[i].y)-(p[j].y-p[i].y)*(p[i+8].x-p[i].x)>=0)continue;
   screen_quad(p[i],p[j],p[i+8],p[j+8],color(col.r*l/100,col.g*l/100,col.b*l/100));
  }
  for(i=1;i<7;i++){
