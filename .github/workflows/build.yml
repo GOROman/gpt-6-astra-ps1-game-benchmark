@@ -59,8 +59,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          cp README.md docs/CONTROLS.md release/
+          cp README.md PROMPTS.md docs/CONTROLS.md release/
+          cp -R docs release/docs
           cd release
           sha256sum -c SHA256SUMS
-          zip "facet-fighter-${RELEASE_TAG}.zip" facet.bin facet.cue facet.exe SHA256SUMS README.md CONTROLS.md
+          zip -r "facet-fighter-${RELEASE_TAG}.zip" facet.bin facet.cue facet.exe SHA256SUMS README.md CONTROLS.md PROMPTS.md docs
           gh release create "$RELEASE_TAG" --verify-tag --title "FACET FIGHTER ${RELEASE_TAG}" --notes-file ../docs/RELEASE_NOTES.md "facet-fighter-${RELEASE_TAG}.zip" facet.bin facet.cue facet.exe SHA256SUMS
