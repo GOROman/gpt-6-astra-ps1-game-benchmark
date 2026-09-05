@@ -1,0 +1,16 @@
+FACET FIGHTER — final integration, 2026-09-05
+Source: d93966e; GitHub Actions run 33941217198
+DuckStation 0.1-11752, Metal 320x240, CPU overclock disabled.
+Native VSync(-1) deltas are accumulated during PLAY and printed only on exit.
+One rendered interval per emulated VBlank is the NTSC 60 FPS target (~59.82 Hz).
+Inputs: DuckStation pad macros; no game-state or health overrides.
+
+Full three-stage arcade campaign, champion (screenshot 015):
+FACET match frames=3777 vblanks=3777 slow=0 max=1 winner=0 reason=2
+
+Two-Ember 2P versus, including pause, crouch, P2 punches and backstep/ring-out
+(screenshots 016–018):
+FACET match frames=3197 vblanks=3197 slow=0 max=1 winner=1 reason=2
+
+Total: 6974 rendered intervals, 6974 VBlanks, zero slow intervals.
+This is emulator evidence, not physical-console verification or exhaustive coverage.

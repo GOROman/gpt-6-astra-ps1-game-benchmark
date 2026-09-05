@@ -7,7 +7,7 @@
 - [x] Flat-shaded articulated 3D fighters and raised arena rendered in emulator at 60 FPS.
 - [x] Title, selection, CPU play, two-player versus, pause and result screen.
 - [x] SPU attack / hit / round output captured from the emulator (audio sample linked below).
-- [ ] Emulator playthrough and two-controller input verified.
+- [x] Emulator playthrough and two-controller input verified.
 - [x] Build instructions, controls and evidence published.
 - [ ] Completion tag and GitHub Release artifacts published.
 
@@ -34,4 +34,8 @@ SPU verification (`f556430`): 70.615 seconds of emulator-native stereo PCM at 44
 
 2026-09-05 `fddb383`: synchronous combat logging removed. Five complete CPU demo matches total 9,338 frames / 9,338 VBlanks, zero slow frames. Interactive title, selection, arcade, pause/resume, result/rematch, 2P character selection, 2P pause and movement/ring-out verified through emulator pad macros. HOW TO PLAY layout verified. This is emulated-controller verification, not physical-controller testing.
 
-Remaining integration: `3ce1d20` builds successfully and shares projected floor vertices to improve headroom after one slow interval in a two-Ember versus run. Its image is downloaded and checksum-verified but not yet booted: the existing emulator window became unavailable to CUA (`noWindowsAvailable`). Recheck that build, KO/pause overlay fix, full arcade completion, and sustained two-player frame delivery before release. Restore the saved original controller preset after input verification.
+Final integration (`d93966e`, Actions run [33941217198](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33941217198)): all three arcade stages cleared via emulated pad inputs; ARCADE CHAMPION displayed. Complete campaign: 3,777 frames / 3,777 VBlanks, zero slow intervals. Two-Ember versus: 3,197 frames / 3,197 VBlanks, zero slow intervals, including pause. P2 character selection, movement, punch damage, pause/resume, P1 crouch high-attack avoidance and backstep/ring-out were observed. Pause and result overlays are legible. See [final frame audit](frame-audit-final.txt) and screenshots 015–018 in the implementation history.
+
+Original Pad1/Pad2 bindings were restored and compared with the saved preset; TTY and file logging were returned to their original disabled state. Only one DuckStation instance was used. Physical PS1 and physical gamepad testing remain unperformed. These measurements verify the recorded emulator runs, not every possible gameplay sequence.
+
+Final presentation correction: attract-mode entry resets the displayed stage and mode instead of retaining the previous arcade/versus HUD. Release packaging remains pending.

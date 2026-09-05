@@ -1,8 +1,8 @@
 # FACET FIGHTER — PlayStation 1
 
-[![Development progress: 80% (8/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
+[![Development progress: 90% (9/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
 
-**進捗: 80% — 10項目中8項目を検証済み。** PS1 ビルドと人体の描画を確認。SPU音声の録音を確認。操作・対戦の受け入れ検証を進行中。完成後にタグ・Release を公開します。
+**進捗: 90% — 10項目中9項目を検証済み。** 全3ステージクリア・2P操作・SPU音声をエミュレーターで確認。最終ビルド後にタグ・Releaseを公開します。
 
 **開発モデル: GPT-6 Astra** — Codex 上で段階的に開発し、タスク単位で commit & push しています。ユーザーの指示履歴は [PROMPTS.md](PROMPTS.md) に時刻付きで記録します。
 
@@ -36,9 +36,9 @@ Run portable rule tests with `./tools/test.sh`.
 
 ## 最新の実行画面
 
-![2P対戦のリングアウト結果](docs/screenshots/012-versus-ringout-result.png)
+![全3ステージをクリア](docs/screenshots/015-arcade-champion.png)
 
-タイトル・キャラ選択・アーケード・ポーズ・結果・再戦、2番パッドの選択／移動／リングアウトをエミュレーターで確認しました。同期ログを対戦後へ移し、CPU戦5試合 **9,338フレームで処理落ち0回**。2P戦には1回の遅延が残ったため床の投影を最適化し、最新ビルドを再検証中です。[計測ログ](docs/frame-audit-deferred.txt)。物理PS1・物理コントローラー試験とは区別しています。
+アーケード全3ステージをクリアし、2番パッドのキャラ選択・移動・打撃・ポーズ、しゃがみ回避とバックステップを確認。通しクリア **3,777フレーム** と同キャラ2P戦 **3,197フレーム** は、合計 **6,974フレームで処理落ち0回**（各描画1 VBlank）。[最終計測ログ](docs/frame-audit-final.txt)。物理PS1・物理コントローラーは未試験です。
 
 [スクリーンショット付き実装履歴](docs/IMPLEMENTATION.md)
 
