@@ -136,3 +136,11 @@ KO中のポーズでラウンド告知とポーズ文面が重なることを発
 入力には[DuckStation公式実装の保持型マクロ](https://raw.githubusercontent.com/stenzek/duckstation/master/src/util/input_manager.cpp)を利用した。元の入力プリセットはローカルに保存。PS1入力処理自体は変更せず、タイトルから実際のパッド経路で検証した。
 
 `3ce1d20` は[Actions run 33932139842](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33932139842) 成功。ダウンロードとチェックサム検証後、既存エミュレーター内で切り替え中にCUAが `noWindowsAvailable` となった。最新の床最適化とポーズ修正の画面確認は未完了。
+
+### CPUの判断間隔
+
+CPUが毎フレーム入力を抽選し直して相手の技へ即座に反応していたため、難易度1/2/3で12/10/8戦闘フレームごとに判断する方式へ変更。判断の間は入力を保持し、ヒットストップ中は判断時計も停止する。描画・戦闘シミュレーションは60Hzを維持する。判断間隔とラウンド間リセット、長時間の決定性をテストする。
+
+最新床最適化を含む`3ce1d20`はエミュレーターで起動済み。アーケードのステージ2への遷移、道着モデル同士の描画を確認。
+
+![アーケードのステージ2](screenshots/014-arcade-stage-two.png)

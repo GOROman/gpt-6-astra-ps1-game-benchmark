@@ -26,7 +26,8 @@ typedef struct {
 typedef struct {
  Fighter f[2]; int phase,tick,remaining,round,winner,reason,events;
  int hitstop,effect_life[2],effect_x[2],effect_z[2],effect_y[2],effect_block[2];
- uint16_t freeze_input[2];
+ uint16_t freeze_input[2],cpu_input[2];
+ int cpu_wait[2];
  uint32_t rng;
 } Game;
 extern const Move game_moves[7];

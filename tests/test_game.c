@@ -49,6 +49,17 @@ int main(void){
  start(400);g.f[0].x=g.f[1].x=0;g.f[0].z=-200;g.f[1].z=200;
  {int i;for(i=0;i<60;i++){int a=game_cpu(&g,0,1),b=game_cpu(&g,1,1);game_tick(&g,a,b);}}
  assert(game_distance(&g.f[0],&g.f[1])<300);
+ /* CPU holds a decision, rather than reacting immediately to a new attack. */
+ {int difficulty;
+  for(difficulty=1;difficulty<=3;difficulty++){
+   uint16_t held;uint32_t rng;int j,period=14-difficulty*2;
+   start(400);held=game_cpu(&g,1,difficulty);rng=g.rng;
+   g.f[0].action=PUNCH;
+   for(j=1;j<period;j++){assert(game_cpu(&g,1,difficulty)==held);assert(g.rng==rng);}
+   (void)game_cpu(&g,1,difficulty);assert(g.rng!=rng);
+   g.phase=ROUND_OVER;assert(game_cpu(&g,1,difficulty)==0);assert(g.cpu_wait[1]==0);
+  }
+ }
  /* Identical seeds and commands must remain bit-identical for long runs. */
  {Game a,b;int i;game_init(&a,0,1,37);game_init(&b,0,1,37);
   for(i=0;i<20000;i++){

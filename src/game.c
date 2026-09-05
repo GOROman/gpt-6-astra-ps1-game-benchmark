@@ -167,7 +167,7 @@ void game_tick(Game*g,uint16_t p1,uint16_t p2){
   int h0=g->f[0].hp,h1=g->f[1].hp;finish(g,h0==h1?-1:(h0>h1?0:1),h0==h1?DRAW:TIME_UP);
  }
 }
-uint16_t game_cpu(Game*g,int player,int difficulty){
+static uint16_t cpu_decide(Game*g,int player,int difficulty){
  Fighter*a=&g->f[player],*b=&g->f[player^1];int d=game_distance(a,b);unsigned r;
  g->rng^=g->rng<<13;g->rng^=g->rng>>17;g->rng^=g->rng<<5;r=g->rng;
  if(g->phase!=FIGHT)return 0;
@@ -188,4 +188,17 @@ uint16_t game_cpu(Game*g,int player,int difficulty){
  if(r%7==0)return IN_KICK;
  if(r%5==0)return IN_PUNCH;
  return 0;
+}
+
+uint16_t game_cpu(Game*g,int player,int difficulty){
+ if(g->phase!=FIGHT){g->cpu_wait[player]=0;g->cpu_input[player]=0;return 0;}
+ if(g->hitstop)return g->cpu_input[player];
+ if(g->cpu_wait[player]>0){g->cpu_wait[player]--;return g->cpu_input[player];}
+ if(difficulty<1)difficulty=1;
+ if(difficulty>3)difficulty=3;
+ /* Decide every 12/10/8 simulation ticks, then hold that input. This gives
+    attacks a reaction window instead of rerolling an instant guard each tick. */
+ g->cpu_wait[player]=13-difficulty*2;
+ g->cpu_input[player]=cpu_decide(g,player,difficulty);
+ return g->cpu_input[player];
 }
