@@ -89,7 +89,7 @@ int main(void){
    if(edge[0]&(PAD_START|PAD_CROSS)){screen=choice==2?HELP:SELECT;versus=choice==1;idle=0;}
    if(p[0]||p[1])idle=0;
    idle+=steps;
-   if(idle>600){demo=1;screen=PLAY;game_init(&game,0,1,(unsigned)frame+1);}
+   if(idle>600){demo=1;versus=0;stage=1;screen=PLAY;game_init(&game,0,1,(unsigned)frame+1);}
   }else if(screen==HELP){if(edge[0]&(PAD_START|PAD_CROSS|PAD_SELECT))screen=TITLE;}
   else if(screen==SELECT){
    for(i=0;i<(versus?2:1);i++)if(edge[i]&(PAD_LEFT|PAD_RIGHT))chars[i]^=1;
