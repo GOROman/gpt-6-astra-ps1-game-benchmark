@@ -47,7 +47,7 @@ static void timer_digit(int x,int y,int digit,int urgent){
  int n;for(n=0;n<7;n++)if(mask[digit]&(1u<<n))
   render_rect(x+segment[n][0],y+segment[n][1],segment[n][2],segment[n][3],245,urgent?86:231,urgent?54:172);
 }
-static void hud(const Game*g,int versus,int stage){
+static void hud(const Game*g,int versus,int stage,int announce){
  char text[64];int i;
  int seconds=(g->remaining+59)/60;
  timer_digit(144,14,seconds/10,seconds<=10);timer_digit(161,14,seconds%10,seconds<=10);
@@ -62,8 +62,8 @@ static void hud(const Game*g,int versus,int stage){
  sprintf(text,"ROUND %d   %s",g->round,versus?"2P VERSUS":"ARCADE");render_center(218,text);
  if(!versus){sprintf(text,"STAGE %d/3",stage);render_center(204,text);}
  render_rect(8,5,304,44,12,20,33);
- if(g->phase==INTRO){sprintf(text,g->tick<40?"ROUND %d":"FIGHT!",g->round);render_center(88,text);}
- if(g->phase==ROUND_OVER){
+ if(announce&&g->phase==INTRO){sprintf(text,g->tick<40?"ROUND %d":"FIGHT!",g->round);render_center(88,text);}
+ if(announce&&g->phase==ROUND_OVER){
   static const char*reason[]={"","K.O.","RING OUT","TIME UP","DRAW"};
   render_center(84,reason[g->reason]);
   if(g->winner>=0){sprintf(text,"%s WINS",game_character_name(g->f[g->winner].character));render_center(98,text);}
@@ -158,7 +158,7 @@ int main(void){
    render_center(180,"FIRST TO TWO ROUNDS WINS");render_center(194,"GUARD LOW: DOWN+CROSS");
    render_center(218,"START TO RETURN");render_rect(12,18,296,212,12,20,33);
   }else{
-   hud(&game,versus,stage);
+   hud(&game,versus,stage,screen==PLAY&&!paused);
    if(demo)render_center(62,"DEMO - PRESS ANY BUTTON");
    if(paused){render_center(94,"PAUSED");render_center(110,"START: RESUME");render_center(124,"SELECT: TITLE");render_rect(72,84,176,54,12,20,33);}
    if(screen==RESULT){
