@@ -1,8 +1,8 @@
 # FACET FIGHTER — PlayStation 1
 
-[![Development progress: 60% (6/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
+[![Development progress: 80% (8/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
 
-**進捗: 60% — 10項目中6項目を検証済み。** PS1 ビルドと人体の描画を確認。SPU音声の録音を確認。操作・対戦の受け入れ検証を進行中。完成後にタグ・Release を公開します。
+**進捗: 80% — 10項目中8項目を検証済み。** PS1 ビルドと人体の描画を確認。SPU音声の録音を確認。操作・対戦の受け入れ検証を進行中。完成後にタグ・Release を公開します。
 
 **開発モデル: GPT-6 Astra** — Codex 上で段階的に開発し、タスク単位で commit & push しています。ユーザーの指示履歴は [PROMPTS.md](PROMPTS.md) に時刻付きで記録します。
 
@@ -36,9 +36,9 @@ Run portable rule tests with `./tools/test.sh`.
 
 ## 最新の実行画面
 
-![継続VBlank計測中のPS1対戦画面](docs/screenshots/006-vblank-audit.png)
+![2P対戦のリングアウト結果](docs/screenshots/012-versus-ringout-result.png)
 
-GitHub Actions の `83a2c80` を既存のDuckStationで読み直して実行。表示は **59.82 FPS** ですが、継続計測では4,200描画フレーム中9回の2VBlank間隔を検出しました。診断ログの負荷も含めて調査中で、60fps維持の受け入れは未完了です。[計測ログ](docs/frame-audit.txt)。実機確認とは区別しています。
+タイトル・キャラ選択・アーケード・ポーズ・結果・再戦、2番パッドの選択／移動／リングアウトをエミュレーターで確認しました。同期ログを対戦後へ移し、CPU戦5試合 **9,338フレームで処理落ち0回**。2P戦には1回の遅延が残ったため床の投影を最適化し、最新ビルドを再検証中です。[計測ログ](docs/frame-audit-deferred.txt)。物理PS1・物理コントローラー試験とは区別しています。
 
 [スクリーンショット付き実装履歴](docs/IMPLEMENTATION.md)
 

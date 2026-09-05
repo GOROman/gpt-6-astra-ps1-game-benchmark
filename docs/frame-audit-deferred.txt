@@ -1,0 +1,12 @@
+Build: fddb383
+Environment: DuckStation native NTSC, CPU overclock disabled
+First five entries: full CPU demo matches before controller preset changes
+Later entries: interactive arcade / versus / pause verification
+I/TTY: FACET match frames=1853 vblanks=1853 slow=0 max=1 winner=1 reason=1
+I/TTY: FACET match frames=2676 vblanks=2676 slow=0 max=1 winner=1 reason=1
+I/TTY: FACET match frames=1714 vblanks=1714 slow=0 max=1 winner=0 reason=1
+I/TTY: FACET match frames=1235 vblanks=1235 slow=0 max=1 winner=1 reason=1
+I/TTY: FACET match frames=1860 vblanks=1860 slow=0 max=1 winner=0 reason=1
+I/TTY: FACET match frames=3410 vblanks=3410 slow=0 max=1 winner=1 reason=1
+I/TTY: FACET match frames=1054 vblanks=1054 slow=0 max=1 winner=1 reason=1
+I/TTY: FACET match frames=3889 vblanks=3890 slow=1 max=2 winner=0 reason=2

@@ -124,3 +124,15 @@ KO中のポーズでラウンド告知とポーズ文面が重なることを発
 ![2番パッドからポーズ](screenshots/011-two-player-pause.png)
 
 `fddb383` のCPU戦5試合は計9,338フレームで処理落ち0。ただし道着モデル同士の2P戦（ポーズを含む）は3,889フレーム中1回の2VBlank間隔が残った。床の共有頂点をフレーム内で使い回し、投影回数を256から81へ削減する。形状・面数・並び順は維持。切り分けが済んだパッド診断出力も撤去。
+
+### 入力検証の追加証拠と現在の検証境界
+
+![2P移動によるリングアウトの試合結果](screenshots/012-versus-ringout-result.png)
+
+![操作説明の重なり修正を確認](screenshots/013-help-layout.png)
+
+[対戦後にまとめて出力したフレーム計測](frame-audit-deferred.txt)。最初のCPU戦5試合、合計9,338フレームはすべて1VBlankだった。その後の対人操作テストとは区別する。
+
+入力には[DuckStation公式実装の保持型マクロ](https://raw.githubusercontent.com/stenzek/duckstation/master/src/util/input_manager.cpp)を利用した。元の入力プリセットはローカルに保存。PS1入力処理自体は変更せず、タイトルから実際のパッド経路で検証した。
+
+`3ce1d20` は[Actions run 33932139842](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33932139842) 成功。ダウンロードとチェックサム検証後、既存エミュレーター内で切り替え中にCUAが `noWindowsAvailable` となった。最新の床最適化とポーズ修正の画面確認は未完了。
