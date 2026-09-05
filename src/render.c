@@ -251,10 +251,12 @@ void render_begin(const Game*g,int frame,int presentation){
  old_hp=hp;
 }
 void render_scene(const Game*g,int frame){int x,z,i;
- /* Individual flat tiles make perspective and foot movement readable. */
- for(z=-800;z<800;z+=200)for(x=-800;x<800;x+=200){
-  int shade=((x+z)/200)&1;
-  quad(v(x,0,z),v(x+200,0,z),v(x,0,z+200),v(x+200,0,z+200),shade?color(73,87,99):color(84,100,112));
+ Screen floor[9][9];
+ /* Adjacent tiles share vertices: project 81 points, not 256. */
+ for(z=0;z<9;z++)for(x=0;x<9;x++)floor[z][x]=project(v(x*200-800,0,z*200-800));
+ for(z=0;z<8;z++)for(x=0;x<8;x++){
+  int shade=(x+z)&1;
+  screen_quad(floor[z][x],floor[z][x+1],floor[z+1][x],floor[z+1][x+1],shade?color(73,87,99):color(84,100,112));
  }
  quad(v(-800,0,-800),v(800,0,-800),v(-800,-85,-800),v(800,-85,-800),color(29,45,61));
  quad(v(-800,0,800),v(-800,0,-800),v(-800,-85,800),v(-800,-85,-800),color(25,36,50));

@@ -14,16 +14,8 @@
 
 enum ScreenMode { TITLE, SELECT, PLAY, RESULT, HELP };
 static uint8_t pads[2][34];
-static uint16_t read_pad(int n,int trace){
+static uint16_t read_pad(int n){
  const PADTYPE*p=(const PADTYPE*)pads[n];
- static unsigned last[2]={0xffffffffu,0xffffffffu};
- unsigned state=(unsigned)pads[n][0]|((unsigned)pads[n][1]<<8)|((unsigned)p->btn<<16);
- /* BIOS writes these buffers asynchronously. Log changes only, so a missing
-    device, a rejected packet and a missed host key can be distinguished. */
- if(trace&&state!=last[n]){
-  printf("FACET pad%d status=%02x id=%02x buttons=%04x\n",n+1,pads[n][0],pads[n][1],(unsigned)(uint16_t)~p->btn);
-  last[n]=state;
- }
  if(p->stat||p->len<1)return 0;
  if(p->type!=PAD_ID_DIGITAL&&p->type!=PAD_ID_ANALOG&&p->type!=PAD_ID_ANALOG_STICK)return 0;
  return (uint16_t)~p->btn;
@@ -78,7 +70,7 @@ int main(void){
  last_vblank=VSync(-1);
  game_init(&game,0,1,1);printf("FACET boot: native PS1\n");
  for(;;){
-  uint16_t p[2]={read_pad(0,screen!=PLAY),read_pad(1,screen!=PLAY)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
+  uint16_t p[2]={read_pad(0),read_pad(1)},edge[2]={p[0]&~previous[0],p[1]&~previous[1]};
   int now=VSync(-1),steps=now-last_vblank;
   int i,oldscreen=screen;last_vblank=now;
   /* Accumulate combat intervals without synchronous TTY writes. Report only
