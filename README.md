@@ -1,14 +1,14 @@
 # FACET FIGHTER — PlayStation 1
 
-[![Development progress: 90% (9/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
+[![Development progress: 100% (10/10 verified milestones)](docs/progress.svg)](docs/STATUS.md)
 
-**進捗: 90% — 10項目中9項目を検証済み。** 全3ステージクリア・2P操作・SPU音声をエミュレーターで確認。最終ビルド後にタグ・Releaseを公開します。
+**進捗: 100% — 10項目中10項目を完了。** 全3ステージクリア・2P操作・SPU音声をエミュレーターで確認。[v0.1.0をダウンロード](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/releases/tag/v0.1.0)。
 
 **開発モデル: GPT-6 Astra** — Codex 上で段階的に開発し、タスク単位で commit & push しています。ユーザーの指示履歴は [PROMPTS.md](PROMPTS.md) に時刻付きで記録します。
 
 An original flat-shaded 3D fighting game for the original PlayStation, inspired by early polygonal arcade fighters. All fighters, geometry and presentation are original.
 
-## Planned game
+## Game
 
 - Articulated low-poly fighters on an open, raised square arena.
 - Punch / kick / guard controls, crouching, jumping, throws and high/mid/low attacks.
@@ -24,7 +24,7 @@ An original flat-shaded 3D fighting game for the original PlayStation, inspired 
 4. Sound, tuning and integration verification.
 5. Emulator acceptance run, distributable image and documented results.
 
-Each completed step is committed and pushed separately. Completion is tracked in [docs/STATUS.md](docs/STATUS.md); the specification above is the target, not a claim that it is all implemented.
+Each completed step is committed and pushed separately. Verification scope is recorded in [docs/STATUS.md](docs/STATUS.md). Version 0.1.0 is released; physical-console validation remains separate.
 
 ## Tools
 

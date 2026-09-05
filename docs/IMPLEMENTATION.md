@@ -164,3 +164,9 @@ CPUが毎フレーム入力を抽選し直して相手の技へ即座に反応�
 最終表示修正：タイトルのデモへ入る際にステージ番号と対戦モードをリセットし、直前のアーケード／2P戦の表示が残らないようにした。
 
 配布ZIPに `docs/` と `PROMPTS.md` も同梱し、READMEから画像・操作説明・検証記録への相対リンクを保つ。
+
+### v0.1.0 公開
+
+`80fa65c` に `v0.1.0` を付与し、[Actionsのタグビルド](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33942764502)から[Release](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/releases/tag/v0.1.0)を公開。EXE/BIN/CUE、SHA256SUMS、文書・画像入りZIPをダウンロードしてチェックサム・ZIP整合性・相対リンクを検証。公開BIN/CUEを同じDuckStationで開き直してデモ動作を確認した。READMEの受け入れ進捗を100%へ更新。実機PS1試験は未実施。
+
+![公開ディスクイメージのデモ](screenshots/019-release-demo.png)

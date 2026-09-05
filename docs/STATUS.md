@@ -9,7 +9,7 @@
 - [x] SPU attack / hit / round output captured from the emulator (audio sample linked below).
 - [x] Emulator playthrough and two-controller input verified.
 - [x] Build instructions, controls and evidence published.
-- [ ] Completion tag and GitHub Release artifacts published.
+- [x] Completion tag and GitHub Release artifacts published.
 
 Physical-console testing must be reported separately from emulator testing.
 
@@ -38,4 +38,6 @@ Final integration (`d93966e`, Actions run [33941217198](https://github.com/GOROm
 
 Original Pad1/Pad2 bindings were restored and compared with the saved preset; TTY and file logging were returned to their original disabled state. Only one DuckStation instance was used. Physical PS1 and physical gamepad testing remain unperformed. These measurements verify the recorded emulator runs, not every possible gameplay sequence.
 
-Final presentation correction: attract-mode entry resets the displayed stage and mode instead of retaining the previous arcade/versus HUD. Release packaging remains pending.
+Final presentation correction: attract-mode entry resets the displayed stage and mode instead of retaining the previous arcade/versus HUD. Released as [v0.1.0](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/releases/tag/v0.1.0) at `80fa65c`.
+
+Release verification: [tag build and release run 33942764502](https://github.com/GOROman/gpt-6-astra-ps1-game-benchmark/actions/runs/33942764502) passed. Downloaded public EXE/BIN/CUE and ZIP; all SHA256SUMS checks passed, ZIP integrity and Markdown relative links passed. Released EXE matches the smoke-tested build byte-for-byte. The downloaded release BIN/CUE also boots and runs its demo in the same DuckStation (screenshot 019). ZIP SHA-256: `4c491939157443802166815ab61d6d0258d4ea83e57cb304e299f92f51f528ad`.
